@@ -5,6 +5,69 @@ const loadLessons = () => {
 
 
 
+const createelements = (arr) => {
+
+    const htmlElements = arr.map(item => `<span class="btn">${item}</span>`).join(' ');
+    return htmlElements;
+}
+
+const loadWordDetail = async(id) => {
+    const url = `https://openapi.programming-hero.com/api/word/${id}`;
+    const res = await fetch(url);
+    const details = await res.json();
+    // Handle the word detail data
+    displayWordDetails(details.data);
+};
+
+
+const manageSpinner = (status) => {
+    if (status == true) {
+        document.getElementById('spinner').classList.remove('hidden');
+        document.getElementById('word-container').classList.add('hidden');
+    } else {
+        document.getElementById('spinner').classList.add('hidden');
+        document.getElementById('word-container').classList.remove('hidden');
+    }
+
+};
+const displayWordDetails = (word) => {
+
+    
+const detailsBox = document.getElementById('details-container');
+
+detailsBox.innerHTML = `<div class="">
+        <h2 class="text-2xl font-bold">
+          ${word.word} (<i class="fa-solid fa-microphone-lines" style="color: rgb(114, 73, 235);"></i> :${word.pronunciation})
+        </h2>
+      </div>
+      <div class="">
+        <h2 class="font-bold">
+          Menaing
+        </h2>
+        <p class="">
+          ${word.meaning}
+        </p>
+      </div>
+      <div class="">
+        <h2 class="font-bold">
+          Example
+        </h2>
+        <p class="text-lg">
+          ${word.sentence}
+        </p>
+      </div>
+      <div class="">
+        <h2 class="font-bold">
+          Synonyms
+        </h2>
+      <div>${createelements(word.synonyms)}</div>
+      </div>`
+
+
+document.getElementById('word_modal').showModal();
+}
+
+
 
 const removeActiveClass = () => {
     const lessonBtns = document.querySelectorAll('.lesson-btn');
@@ -13,6 +76,7 @@ const removeActiveClass = () => {
 
 const loadLevelWord = (id) => {
 
+    manageSpinner(true);
     const url = `https://openapi.programming-hero.com/api/level/${id}`;
     fetch(url)
         .then((res) => res.json()).then((data) => {
@@ -41,6 +105,7 @@ const displayLevelWord = (words) => {
         <h2 class="font-bold text-2xl">নেক্সট Lesson এ যান</h2>
         </div>
         `;
+        manageSpinner(false);
         return;
     }
 
@@ -58,7 +123,7 @@ const displayLevelWord = (words) => {
 
       <div class="flex justify-between items center"> 
       
-        <button onclick="my_modal_1.showModal()" class="btn btn-primary"><i class="fa-solid fa-circle-info" style="color: #ffffff;"></i></button>
+        <button onclick="loadWordDetail(${word.id} )" class="btn btn-primary"><i class="fa-solid fa-circle-info" style="color: #ffffff;"></i></button>
         <button class="btn btn-primary"><i class="fa-solid fa-volume fa-xs" style="color: rgb(250, 250, 250);"></i></button>
       </div>
 
@@ -67,7 +132,7 @@ const displayLevelWord = (words) => {
 
         WordContainer.appendChild(card);
     });
-
+manageSpinner(false);
 };
 
 
