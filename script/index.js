@@ -91,6 +91,12 @@ const loadLevelWord = (id) => {
 };
 
 
+function pronounceWord(word) {
+  const utterance = new SpeechSynthesisUtterance(word);
+  utterance.lang = "en-EN"; // English
+  window.speechSynthesis.speak(utterance);
+}
+
 const displayLevelWord = (words) => {
     const WordContainer = document.getElementById('word-container');
     WordContainer.innerHTML = '';
@@ -124,7 +130,7 @@ const displayLevelWord = (words) => {
       <div class="flex justify-between items center"> 
       
         <button onclick="loadWordDetail(${word.id} )" class="btn btn-primary"><i class="fa-solid fa-circle-info" style="color: #ffffff;"></i></button>
-        <button class="btn btn-primary"><i class="fa-solid fa-volume fa-xs" style="color: rgb(250, 250, 250);"></i></button>
+        <button class="btn btn-primary" onclick="pronounceWord('${word.word}')"><i class="fa-solid fa-volume fa-xs" style="color: rgb(250, 250, 250);"></i></button>
       </div>
 
     </div>`;
