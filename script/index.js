@@ -104,7 +104,7 @@ const displayLevelWord = (words) => {
 
     if (words.length === 0) {
         WordContainer.innerHTML = `
-        <div class="font-bangla bg-white rounded-xl col-span-3 shadow-sm text-center py-10 px-5 space-y-4"> <img class="mx-auto" src="./assets/alert-error.png" alt="No words found">
+        <div class="font-bangla bg-white rounded-xl col-span-full shadow-sm text-center py-10 px-5 space-y-4"> <img class="mx-auto" src="./assets/alert-error.png" alt="No words found">
         <p class="font-semibold text-lg text-gray-500">
         এই Lesson এ এখনো কোন Vocabulary যুক্ত করা হয়নি।
         </p>
