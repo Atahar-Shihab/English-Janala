@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- SEO Meta Tags -->
-    <meta name="description" content="English Janala — Your free interactive English vocabulary learning platform. Browse lessons, discover new words, hear pronunciations, and master English effortlessly.">
-    <meta name="keywords" content="English learning, vocabulary, pronunciation, Bengali, education, free, interactive lessons">
+    <meta name="description" content="English Janala — Interactive English vocabulary learning platform for Bengali speakers. Browse lessons, discover words, hear native pronunciations, and master vocabulary effortlessly.">
+    <meta name="keywords" content="English learning, vocabulary, pronunciation, Bengali, education, free, interactive lessons, English Janala">
     <meta name="author" content="Atahar Shihab">
 
     <!-- Open Graph / Social Media -->
@@ -14,19 +14,18 @@
     <meta property="og:title" content="English Janala — Master English Vocabulary">
     <meta property="og:description" content="A free, interactive vocabulary learning platform for Bengali-speaking English learners.">
     <meta property="og:image" content="./assets/hero-student.png">
-    <meta property="og:url" content="https://github.com/Atahar-Shihab/English-Janala">
+    <meta property="og:url" content="https://atahar-shihab.github.io/English-Janala/">
 
     <!-- Title -->
-    <title>English Janala — Master English Vocabulary</title>
+    <title>English Janala — Best English Learning Platform</title>
 
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="./assets/logo.png">
 
-    <!-- Font Awesome -->
+    <!-- Font Awesome 6.6.0 -->
     <link
         rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.css"
-        integrity="sha512-x9WwyMYBnlXMNQ6kQ/Lyzu1NqIhLQKL5Oq6xByfXuRj7s9CskyCbLv/1IjqzJmXwFXWr0ov6jBV7Qbc0hh9nHg=="
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
     >
@@ -35,11 +34,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet"
-    >
-    <link
-        href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap"
         rel="stylesheet"
     >
 
@@ -57,13 +52,13 @@
     >
 </head>
 
-<body class="bg-base-100 text-base-content">
+<body class="bg-base-100 text-base-content min-h-screen flex flex-col">
 
     <!-- ============================== -->
     <!-- Navigation Bar                 -->
     <!-- ============================== -->
-    <header class="sticky top-0 z-50">
-        <nav class="navbar bg-base-100/90 backdrop-blur-md shadow-sm px-4 lg:px-8">
+    <header class="sticky top-0 z-50 bg-base-100/90 backdrop-blur-md shadow-sm border-b border-base-200">
+        <nav class="navbar max-w-7xl mx-auto px-4 lg:px-8">
             <div class="navbar-start">
                 <!-- Mobile Dropdown -->
                 <div class="dropdown">
@@ -72,89 +67,82 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
                         </svg>
                     </div>
-                    <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow-lg">
-                        <li><a href="#"><img src="./assets/fa-circle-question.png" alt="FAQ Icon" class="w-4 h-4"> FAQ</a></li>
-                        <li><a href="#vocabulary-section"><img src="./assets/fa-book-open.png" alt="Learn Icon" class="w-4 h-4"> Learn</a></li>
-                        <li><a href="#"><img src="./assets/fa-arrow-right-from-bracket.png" alt="Logout Icon" class="w-4 h-4"> Logout</a></li>
+                    <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-20 mt-3 w-52 p-2 shadow-xl border border-base-200">
+                        <li><a href="#faq-section"><i class="fa-solid fa-circle-question text-primary"></i> FAQ</a></li>
+                        <li><a href="#vocabulary-section"><i class="fa-solid fa-book-open text-primary"></i> Learn</a></li>
+                        <li><a href="#hero-section"><i class="fa-solid fa-arrow-right-from-bracket text-primary"></i> Get Started</a></li>
                     </ul>
                 </div>
-                <!-- Logo -->
-                <a href="#" class="flex items-center gap-1 logo-pulse">
-                    <span class="text-lg font-bold">English</span>
+                <!-- Brand Logo -->
+                <a href="#" class="flex items-center gap-2 logo-pulse">
+                    <span class="text-xl font-bold tracking-tight">English</span>
                     <img src="./assets/logo.png" alt="English Janala Logo" class="w-8 h-8">
-                    <span class="font-bangla text-lg font-semibold"> জানালা</span>
+                    <span class="font-bangla text-xl font-bold text-primary">জানালা</span>
                 </a>
             </div>
-            <!-- Desktop Nav -->
-            <div class="navbar-end hidden lg:flex">
-                <ul class="menu menu-horizontal px-1 space-x-3">
-                    <li><a href="#" class="btn btn-soft btn-primary btn-hover-lift"><img src="./assets/fa-circle-question.png" alt="FAQ Icon" class="w-4 h-4"> FAQ</a></li>
-                    <li><a href="#vocabulary-section" class="btn btn-soft btn-primary btn-hover-lift"><img src="./assets/fa-book-open.png" alt="Learn Icon" class="w-4 h-4"> Learn</a></li>
-                    <li><a href="#" class="btn btn-soft btn-primary btn-hover-lift"><img src="./assets/fa-arrow-right-from-bracket.png" alt="Logout Icon" class="w-4 h-4"> Logout</a></li>
-                </ul>
+
+            <!-- Desktop Nav Buttons -->
+            <div class="navbar-end hidden lg:flex items-center gap-3">
+                <a href="#faq-section" class="btn btn-sm btn-ghost gap-2">
+                    <i class="fa-solid fa-circle-question text-primary"></i> FAQ
+                </a>
+                <a href="#vocabulary-section" class="btn btn-sm btn-outline btn-primary gap-2">
+                    <i class="fa-solid fa-book-open"></i> Learn
+                </a>
+                <a href="#hero-section" class="btn btn-sm btn-primary gap-2 text-white">
+                    <i class="fa-solid fa-rocket"></i> Get Started
+                </a>
             </div>
         </nav>
     </header>
 
-    <main>
+    <main class="flex-grow">
         <!-- ============================== -->
         <!-- Hero Section                   -->
         <!-- ============================== -->
-        <section class="hero-section flex flex-col-reverse md:flex-row items-center justify-between gap-10 md:gap-x-16 lg:gap-x-32 px-4 py-12 lg:px-24 lg:py-24 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white relative overflow-hidden">
-            <!-- Decorative Background Elements -->
-            <div class="absolute top-0 left-0 w-72 h-72 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-            <div class="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 translate-y-1/3"></div>
+        <section id="hero-section" class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 py-12 lg:px-8 lg:py-20 flex flex-col-reverse md:flex-row items-center justify-between gap-10">
+                
+                <!-- Hero Content -->
+                <div class="content flex-1 text-center md:text-left z-10">
+                    <span class="badge badge-lg bg-white/20 border-white/30 text-white font-medium mb-4 backdrop-blur-sm">
+                        ✨ Open the Window to Learning
+                    </span>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 leading-tight tracking-tight">
+                        <span class="text-sky-300">English</span> is Easy!!
+                    </h1>
 
-            <!-- Hero Content -->
-            <div class="content flex-1 text-center lg:text-left slide-up relative z-10">
-                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
-                    <span class="text-sky-300">English</span> is Easy!!
-                </h1>
+                    <p class="font-bangla text-lg sm:text-xl text-blue-50 leading-relaxed mb-8 max-w-xl">
+                        আজ থেকেই আপনার ভাষা শেখার যাত্রা শুরু করুন। আপনি যদি নতুন হন অথবা আপনার দক্ষতা বাড়াতে চান, আমাদের Interactive Lessons আপনাকে নিয়ে যাবে অন্য একটি Level এ।
+                    </p>
 
-                <p class="font-bangla text-lg leading-relaxed opacity-90 mb-2">
-                    আজ থেকেই আপনার ভাষা শেখার যাত্রা শুরু করুন। আপনি যদি নতুন হন অথবা আপনার দক্ষতা বাড়াতে চান, আমাদের Interactive Lessons আপনাকে নিয়ে যাবে অন্য একটি Level এ।
-                </p>
+                    <!-- Clean Translucent Form -->
+                    <div class="flex flex-col items-center md:items-start">
+                        <div class="glassmorphism rounded-2xl w-full max-w-sm p-6 space-y-3">
+                            <h3 class="text-white font-semibold text-base flex items-center gap-2">
+                                <i class="fa-solid fa-user-plus text-sky-300"></i> Create Free Account
+                            </h3>
 
-                <!-- Glassmorphism Login Form -->
-                <div class="flex flex-col items-center lg:items-start mt-8">
-                    <fieldset class="glassmorphism fieldset rounded-2xl w-full max-w-sm border border-white/20 p-6 space-y-3">
-                        <legend class="fieldset-legend text-white/80 text-sm font-medium px-2">🚀 Get Started</legend>
+                            <div>
+                                <label class="label text-xs text-white/90 font-medium py-1">Email Address</label>
+                                <input type="email" class="input input-bordered input-sm w-full bg-white/15 border-white/30 text-white placeholder-white/60 focus:bg-white focus:text-gray-900 transition-colors" placeholder="user@example.com" />
+                            </div>
 
-                        <label class="label text-white/90 text-sm font-medium">Email</label>
-                        <input type="email" class="input input-bordered w-full bg-white/10 border-white/20 text-white placeholder-white/50 focus:border-sky-300" placeholder="your@email.com" />
+                            <div>
+                                <label class="label text-xs text-white/90 font-medium py-1">Password</label>
+                                <input type="password" class="input input-bordered input-sm w-full bg-white/15 border-white/30 text-white placeholder-white/60 focus:bg-white focus:text-gray-900 transition-colors" placeholder="••••••••" />
+                            </div>
 
-                        <label class="label text-white/90 text-sm font-medium">Password</label>
-                        <input type="password" class="input input-bordered w-full bg-white/10 border-white/20 text-white placeholder-white/50 focus:border-sky-300" placeholder="••••••••" />
-
-                        <button class="btn btn-primary w-full mt-4 bg-sky-400 border-sky-400 hover:bg-sky-500 hover:border-sky-500 text-white font-semibold shadow-lg shadow-sky-400/30">
-                            <i class="fa-solid fa-rocket"></i> Get Started
-                        </button>
-                    </fieldset>
-                </div>
-            </div>
-
-            <!-- Hero Image -->
-            <div class="image w-full max-w-md md:flex-1 fade-in relative z-10">
-                <img class="w-full h-auto drop-shadow-2xl" src="./assets/hero-student.png" alt="Student learning English with English Janala">
-            </div>
-        </section>
-
-        <!-- ============================== -->
-        <!-- Word of the Day Section        -->
-        <!-- ============================== -->
-        <section class="py-8 px-4 lg:px-24 fade-in-up">
-            <div class="max-w-4xl mx-auto bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6 md:p-8 shadow-sm">
-                <div class="flex flex-col md:flex-row items-center gap-4 md:gap-6">
-                    <div class="text-5xl">📖</div>
-                    <div class="text-center md:text-left flex-1">
-                        <p class="text-amber-600 font-semibold text-sm uppercase tracking-wider mb-1">Word of the Day</p>
-                        <h3 class="text-2xl md:text-3xl font-bold text-gray-800">Serendipity</h3>
-                        <p class="text-gray-500 italic mt-1">/ˌser.ənˈdɪp.ə.t̬i/</p>
-                        <p class="text-gray-600 mt-2">The fact of finding interesting or valuable things by chance.</p>
+                            <button class="btn btn-sm w-full bg-sky-400 hover:bg-sky-300 text-gray-900 font-bold border-none shadow-md mt-2">
+                                <i class="fa-solid fa-arrow-right"></i> Start Learning Now
+                            </button>
+                        </div>
                     </div>
-                    <button onclick="pronounceWord('Serendipity')" class="btn btn-outline btn-warning btn-hover-lift" aria-label="Pronounce word">
-                        <i class="fa-solid fa-volume-high"></i> Listen
-                    </button>
+                </div>
+
+                <!-- Hero Image -->
+                <div class="image w-full max-w-sm md:max-w-md flex-1 flex justify-center z-10">
+                    <img class="w-full max-w-[380px] h-auto drop-shadow-2xl" src="./assets/hero-student.png" alt="Student learning English with English Janala">
                 </div>
             </div>
         </section>
@@ -162,74 +150,146 @@
         <!-- ============================== -->
         <!-- Stats Counter Section          -->
         <!-- ============================== -->
-        <section class="py-10 px-4 lg:px-24 fade-in-up">
-            <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-                <div class="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-100">
-                    <div class="text-4xl text-blue-500 mb-3"><i class="fa-solid fa-book-open"></i></div>
-                    <h3 class="text-3xl font-bold text-gray-800">500+</h3>
-                    <p class="text-gray-500 font-medium mt-1">Vocabulary Words</p>
+        <section class="py-12 px-4 lg:px-8 bg-base-200/50">
+            <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div class="bg-base-100 rounded-2xl p-6 shadow-sm border border-base-300 text-center flex flex-col items-center">
+                    <div class="w-14 h-14 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mb-3">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <h3 class="text-3xl font-extrabold text-base-content">170+</h3>
+                    <p class="text-sm text-base-content/70 font-medium mt-1">Vocabulary Words</p>
                 </div>
-                <div class="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-100">
-                    <div class="text-4xl text-purple-500 mb-3"><i class="fa-solid fa-graduation-cap"></i></div>
-                    <h3 class="text-3xl font-bold text-gray-800">10+</h3>
-                    <p class="text-gray-500 font-medium mt-1">Interactive Lessons</p>
+                <div class="bg-base-100 rounded-2xl p-6 shadow-sm border border-base-300 text-center flex flex-col items-center">
+                    <div class="w-14 h-14 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-2xl mb-3">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="text-3xl font-extrabold text-base-content">7</h3>
+                    <p class="text-sm text-base-content/70 font-medium mt-1">Structured Lessons</p>
                 </div>
-                <div class="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-100">
-                    <div class="text-4xl text-green-500 mb-3"><i class="fa-solid fa-heart"></i></div>
-                    <h3 class="text-3xl font-bold text-gray-800">100%</h3>
-                    <p class="text-gray-500 font-medium mt-1">Free Forever</p>
+                <div class="bg-base-100 rounded-2xl p-6 shadow-sm border border-base-300 text-center flex flex-col items-center">
+                    <div class="w-14 h-14 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-2xl mb-3">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                    <h3 class="text-3xl font-extrabold text-base-content">100%</h3>
+                    <p class="text-sm text-base-content/70 font-medium mt-1">Free Forever</p>
                 </div>
             </div>
         </section>
 
         <!-- ============================== -->
-        <!-- Vocabulary Learning Section    -->
+        <!-- Word of the Day Banner         -->
         <!-- ============================== -->
-        <section id="vocabulary-section" class="py-8 px-4 lg:px-24">
-            <h2 class="text-3xl sm:text-4xl font-bold mb-2 text-center gradient-text">
-                Let's Learn Vocabulary
-            </h2>
-            <p class="text-center text-gray-500 mb-8">Select a lesson below to start exploring new words</p>
-
-            <!-- Lesson Buttons Container -->
-            <div id="level-container" class="flex flex-wrap justify-center gap-4 py-6">
-                <!-- Lesson buttons will be dynamically generated here -->
-            </div>
-        </section>
-
-        <!-- ============================== -->
-        <!-- Search Section                 -->
-        <!-- ============================== -->
-        <section class="flex justify-center px-4 pb-6">
-            <div class="join shadow-md rounded-lg">
-                <div>
-                    <label class="input validator join-item">
-                        <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
-                        <input id="input-search" type="text" placeholder="Search for a word..." required class="ml-2" />
-                    </label>
+        <section class="py-6 px-4 lg:px-8">
+            <div class="max-w-4xl mx-auto bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 text-center sm:text-left">
+                    <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl shrink-0">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 justify-center sm:justify-start">
+                            <span class="text-xs uppercase font-bold tracking-wider text-amber-700 bg-amber-200/60 px-2 py-0.5 rounded">Word of the Day</span>
+                            <span class="text-xs text-gray-500 italic">/ˌser.ənˈdɪp.ə.t̬i/</span>
+                        </div>
+                        <h4 class="text-xl font-bold text-gray-900 mt-1">Serendipity</h4>
+                        <p class="text-sm text-gray-600">The occurrence of finding valuable or pleasant things by chance.</p>
+                    </div>
                 </div>
-                <button id="btn-search" class="btn btn-primary join-item btn-hover-lift">
-                    <i class="fa-solid fa-search"></i> Search
+                <button onclick="pronounceWord('Serendipity')" class="btn btn-sm btn-outline border-amber-500 text-amber-800 hover:bg-amber-500 hover:text-white shrink-0 gap-2">
+                    <i class="fa-solid fa-volume-high"></i> Listen
                 </button>
             </div>
         </section>
 
         <!-- ============================== -->
-        <!-- Loading Spinner                -->
+        <!-- Vocabulary Section             -->
         <!-- ============================== -->
-        <section id="spinner" class="flex justify-center items-center py-16 hidden">
-            <span class="loading loading-bars loading-xl text-primary"></span>
+        <section id="vocabulary-section" class="py-10 px-4 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold gradient-text tracking-tight mb-2">
+                        Let's Learn Vocabulary
+                    </h2>
+                    <p class="text-base text-base-content/70 max-w-lg mx-auto">
+                        Choose a lesson or search for any word to view its meaning, pronunciation, examples, and synonyms.
+                    </p>
+                </div>
+
+                <!-- Lesson Buttons Container -->
+                <div id="level-container" class="flex flex-wrap justify-center items-center gap-3 py-4">
+                    <!-- Lesson buttons will be dynamically rendered here -->
+                </div>
+
+                <!-- Search Bar -->
+                <div class="flex justify-center mt-6 mb-8">
+                    <div class="join shadow-md rounded-xl max-w-md w-full border border-base-300">
+                        <div class="flex-grow flex items-center bg-base-100 px-3">
+                            <i class="fa-solid fa-magnifying-glass text-base-content/40 mr-2"></i>
+                            <input id="input-search" type="text" placeholder="Search for any word..." class="input input-ghost input-sm w-full focus:outline-none" />
+                        </div>
+                        <button id="btn-search" class="btn btn-sm btn-primary join-item px-5 text-white">
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="spinner" class="flex flex-col justify-center items-center py-16 hidden">
+                    <span class="loading loading-bars loading-lg text-primary"></span>
+                    <p class="text-sm text-base-content/60 font-medium mt-3">Loading vocabulary...</p>
+                </div>
+
+                <!-- Word Cards Grid -->
+                <div id="word-container" class="bg-base-200/60 p-4 sm:p-8 lg:p-10 rounded-3xl min-h-[300px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Default initial state -->
+                    <div class="font-bangla col-span-full text-center rounded-2xl py-16 px-6 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white space-y-4 shadow-lg flex flex-col items-center justify-center">
+                        <div class="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-4xl mb-2 backdrop-blur-sm">
+                            📚
+                        </div>
+                        <p class="text-lg font-medium text-blue-100">আপনি এখনো কোন Lesson Select করেন নি</p>
+                        <h3 class="text-3xl font-bold">একটি Lesson Select করুন বা Search করুন</h3>
+                        <p class="text-sm text-blue-200 max-w-md">উপরে দেওয়া যেকোনো Lesson বাটনে ক্লিক করে সংশ্লিষ্ট শব্দগুলো সহজে শিখে নিন।</p>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- ============================== -->
-        <!-- Vocabulary Cards Container     -->
+        <!-- FAQ Section                    -->
         <!-- ============================== -->
-        <section id="word-container" class="bg-gray-50 p-4 sm:p-6 lg:p-10 w-full max-w-7xl mx-auto my-10 rounded-2xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            <!-- Default placeholder when no lesson is selected -->
-            <div class="font-bangla col-span-full text-center rounded-xl py-14 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 text-white space-y-4 shadow-lg">
-                <div class="text-5xl mb-2">📚</div>
-                <p class="text-xl font-medium text-gray-200">আপনি এখনো কোন Lesson Select করেন নি</p>
-                <h2 class="text-3xl font-bold">একটি Lesson Select করুন।</h2>
+        <section id="faq-section" class="py-12 px-4 lg:px-8 bg-base-200/40">
+            <div class="max-w-4xl mx-auto">
+                <h3 class="text-2xl sm:text-3xl font-bold text-center mb-2">Frequently Asked Questions</h3>
+                <p class="text-center text-base-content/70 text-sm mb-8">Quick answers to common questions about English Janala</p>
+
+                <div class="space-y-3">
+                    <div class="collapse collapse-plus bg-base-100 border border-base-300 rounded-xl">
+                        <input type="radio" name="my-accordion-3" checked="checked" />
+                        <div class="collapse-title text-base font-semibold">
+                            English Janala কি এবং এটি কাদের জন্য?
+                        </div>
+                        <div class="collapse-content text-sm text-base-content/80 font-bangla">
+                            <p>English Janala একটি সম্পূর্ণ ফ্রি ইন্টারেক্টিভ প্ল্যাটফর্ম যা বাংলা ভাষাভাষী শিক্ষার্থীদের জন্য ইংরেজি ভোকাবুলারি শেখা সহজ এবং আনন্দদায়ক করে তুলতে তৈরি করা হয়েছে।</p>
+                        </div>
+                    </div>
+                    <div class="collapse collapse-plus bg-base-100 border border-base-300 rounded-xl">
+                        <input type="radio" name="my-accordion-3" />
+                        <div class="collapse-title text-base font-semibold">
+                            উচ্চারণ কিভাবে শুনব?
+                        </div>
+                        <div class="collapse-content text-sm text-base-content/80 font-bangla">
+                            <p>যেকোনো শব্দের কার্ডে থাকা স্পিকার (Listen) বাটনে ক্লিক করলেই ব্রাউজারের টেক্সট-টু-স্পিচ প্রযুক্তির মাধ্যমে সঠিক উচ্চারণ শোনা যাবে।</p>
+                        </div>
+                    </div>
+                    <div class="collapse collapse-plus bg-base-100 border border-base-300 rounded-xl">
+                        <input type="radio" name="my-accordion-3" />
+                        <div class="collapse-title text-base font-semibold">
+                            আমি কি কোনো নির্দিষ্ট শব্দ খুঁজতে পারব?
+                        </div>
+                        <div class="collapse-content text-sm text-base-content/80 font-bangla">
+                            <p>হ্যাঁ! সার্চ বক্সে যেকোনো ইংরেজি শব্দ লিখে 'Search' বাটনে ক্লিক করলে বা এন্টার চাপলে তাৎক্ষণিকভাবে ফলাফল পাওয়া যাবে।</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
@@ -238,24 +298,26 @@
     <!-- Word Details Modal             -->
     <!-- ============================== -->
     <dialog id="word_modal" class="modal modal-bottom sm:modal-middle">
-        <div class="modal-box p-0 overflow-hidden">
-            <!-- Modal Gradient Header -->
-            <div class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4">
-                <h3 class="text-white font-bold text-lg">📖 Word Details</h3>
+        <div class="modal-box p-0 overflow-hidden border border-base-300 rounded-2xl shadow-2xl max-w-lg">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 text-white flex items-center justify-between">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-book-bookmark"></i> Word Details
+                </h3>
+                <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost text-white">✕</button>
+                </form>
             </div>
-            <!-- Modal Content -->
+            
             <div id="details-container" class="space-y-4 p-6">
-                <!-- Word details will be injected here -->
+                <!-- Details injected dynamically -->
             </div>
-            <form method="dialog" class="px-6 pb-6">
-                <div class="modal-action flex justify-end items-center">
-                    <button class="btn btn-primary btn-hover-lift">
-                        <i class="fa-solid fa-xmark"></i> Close
-                    </button>
-                </div>
-            </form>
+
+            <div class="modal-action bg-base-200/50 px-6 py-3 border-t border-base-300 m-0 flex justify-end">
+                <form method="dialog">
+                    <button class="btn btn-sm btn-primary text-white">Close</button>
+                </form>
+            </div>
         </div>
-        <!-- Click outside to close -->
         <form method="dialog" class="modal-backdrop">
             <button>close</button>
         </form>
@@ -264,62 +326,60 @@
     <!-- ============================== -->
     <!-- Footer                         -->
     <!-- ============================== -->
-    <footer class="bg-gray-900 text-gray-300 mt-12">
-        <!-- Main Footer Content -->
-        <div class="max-w-7xl mx-auto px-4 py-12 lg:px-24">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                <!-- Brand Column -->
+    <footer class="bg-slate-900 text-slate-300 pt-12 pb-6 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-10 border-b border-slate-800">
+                <!-- Col 1: Brand -->
                 <div>
-                    <a href="#" class="flex items-center gap-2 mb-4">
-                        <img src="./assets/logo.png" alt="English Janala Logo" class="w-10 h-10">
-                        <span class="text-xl font-bold text-white">English <span class="font-bangla">জানালা</span></span>
-                    </a>
-                    <p class="text-gray-400 leading-relaxed text-sm">
-                        Your gateway to mastering English vocabulary. Built with ❤️ for Bengali-speaking learners who want to improve their English skills effortlessly.
+                    <div class="flex items-center gap-2 mb-3">
+                        <img src="./assets/logo.png" alt="English Janala Logo" class="w-8 h-8">
+                        <span class="text-xl font-bold text-white">English <span class="font-bangla text-sky-400">জানালা</span></span>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed max-w-sm font-bangla">
+                        সহজে ও আনন্দদায়ক উপায়ে ইংরেজি শব্দভাণ্ডার সমৃদ্ধ করার মুক্ত জানালা। আজই শুরু করুন আপনার ইংরেজি শেখার দারুণ অভিজ্ঞতা।
                     </p>
                 </div>
-                <!-- Quick Links Column -->
+
+                <!-- Col 2: Navigation Links -->
                 <div>
-                    <h4 class="text-white font-semibold text-lg mb-4">Quick Links</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-sky-400 transition-colors duration-200">🏠 Home</a></li>
-                        <li><a href="#vocabulary-section" class="hover:text-sky-400 transition-colors duration-200">📖 Learn Vocabulary</a></li>
-                        <li><a href="#" class="hover:text-sky-400 transition-colors duration-200">❓ FAQ</a></li>
-                        <li><a href="https://github.com/Atahar-Shihab/English-Janala" target="_blank" rel="noopener noreferrer" class="hover:text-sky-400 transition-colors duration-200">⭐ Star on GitHub</a></li>
+                    <h4 class="text-white font-semibold text-base mb-3">Quick Navigation</h4>
+                    <ul class="space-y-2 text-sm text-slate-400">
+                        <li><a href="#" class="hover:text-white transition-colors"><i class="fa-solid fa-house mr-2 text-xs"></i>Home</a></li>
+                        <li><a href="#vocabulary-section" class="hover:text-white transition-colors"><i class="fa-solid fa-book mr-2 text-xs"></i>Learn Vocabulary</a></li>
+                        <li><a href="#faq-section" class="hover:text-white transition-colors"><i class="fa-solid fa-circle-question mr-2 text-xs"></i>FAQ</a></li>
+                        <li><a href="https://github.com/Atahar-Shihab/English-Janala" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors"><i class="fa-brands fa-github mr-2 text-xs"></i>Star on GitHub</a></li>
                     </ul>
                 </div>
-                <!-- Connect Column -->
+
+                <!-- Col 3: Social Links -->
                 <div>
-                    <h4 class="text-white font-semibold text-lg mb-4">Connect With Us</h4>
-                    <div class="flex gap-4">
-                        <a href="#" class="social-link" aria-label="Facebook">
-                            <img src="./assets/fb-thumb.png" alt="Facebook" class="w-10 h-10 rounded-lg hover:scale-110 transition-transform duration-200">
+                    <h4 class="text-white font-semibold text-base mb-3">Connect With Us</h4>
+                    <div class="flex items-center gap-3">
+                        <a href="#" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-blue-600 flex items-center justify-center text-white text-lg transition-colors" title="Facebook" aria-label="Facebook">
+                            <i class="fa-brands fa-facebook-f"></i>
                         </a>
-                        <a href="https://github.com/Atahar-Shihab" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="GitHub">
-                            <img src="./assets/github-thumb.png" alt="GitHub" class="w-10 h-10 rounded-lg hover:scale-110 transition-transform duration-200">
+                        <a href="https://github.com/Atahar-Shihab" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-white text-lg transition-colors" title="GitHub" aria-label="GitHub">
+                            <i class="fa-brands fa-github"></i>
                         </a>
-                        <a href="#" class="social-link" aria-label="Instagram">
-                            <img src="./assets/instagram-thumb.png" alt="Instagram" class="w-10 h-10 rounded-lg hover:scale-110 transition-transform duration-200">
+                        <a href="#" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-pink-600 flex items-center justify-center text-white text-lg transition-colors" title="Instagram" aria-label="Instagram">
+                            <i class="fa-brands fa-instagram"></i>
                         </a>
-                        <a href="#" class="social-link" aria-label="YouTube">
-                            <img src="./assets/youtube-thumb.png" alt="YouTube" class="w-10 h-10 rounded-lg hover:scale-110 transition-transform duration-200">
+                        <a href="#" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-red-600 flex items-center justify-center text-white text-lg transition-colors" title="YouTube" aria-label="YouTube">
+                            <i class="fa-brands fa-youtube"></i>
                         </a>
                     </div>
+                    <p class="text-xs text-slate-500 mt-4">Made with ❤️ for lifelong learners</p>
                 </div>
             </div>
-        </div>
-        <!-- Footer Bottom Bar -->
-        <div class="border-t border-gray-800">
-            <div class="max-w-7xl mx-auto px-4 py-4 lg:px-24 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-500">
+
+            <div class="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
                 <p>&copy; 2025 English Janala. All rights reserved.</p>
-                <p>Made with ❤️ by <a href="https://github.com/Atahar-Shihab" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:underline">Atahar Shihab</a></p>
+                <p>Designed & Developed by <a href="https://github.com/Atahar-Shihab" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:underline font-medium">Atahar Shihab</a></p>
             </div>
         </div>
     </footer>
 
-    <!-- ============================== -->
-    <!-- Back to Top Button             -->
-    <!-- ============================== -->
+    <!-- Back to Top Button -->
     <button id="btn-back-to-top" class="back-to-top" aria-label="Back to top" title="Back to top">
         <i class="fa-solid fa-arrow-up"></i>
     </button>
