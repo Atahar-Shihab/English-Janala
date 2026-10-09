@@ -1,16 +1,329 @@
+/* ================================================
+   English Janala — Custom Styles
+   ================================================
+   Table of Contents:
+   1. Global & Base Styles
+   2. Typography
+   3. Animations & Keyframes
+   4. Glassmorphism
+   5. Navigation
+   6. Hero Section
+   7. Cards & Hover Effects
+   8. Buttons
+   9. Back to Top
+   10. Footer
+   11. Scrollbar
+   12. Utilities
+   ================================================ */
+
+/* ------------------------------------------------
+   1. Global & Base Styles
+   ------------------------------------------------ */
 * {
-
     font-family: 'Poppins', sans-serif;
-
-
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.font-bangla{
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* ------------------------------------------------
+   2. Typography
+   ------------------------------------------------ */
+.font-bangla {
     font-family: 'Hind Siliguri', sans-serif;
 }
 
+.gradient-text {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #6366f1 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 
-.btn-active{
+/* ------------------------------------------------
+   3. Animations & Keyframes
+   ------------------------------------------------ */
+
+/* Fade In */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Slide Up */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-up {
+    animation: slideUp 0.8s ease-out 0.2s forwards;
+    opacity: 0;
+}
+
+/* Fade In Up */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Card Pop In */
+@keyframes cardPopIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.card-animate {
+    animation: cardPopIn 0.4s ease-out forwards;
+}
+
+/* Logo Pulse */
+@keyframes logoPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+
+.logo-pulse img {
+    animation: logoPulse 3s ease-in-out infinite;
+}
+
+/* ------------------------------------------------
+   4. Glassmorphism
+   ------------------------------------------------ */
+.glassmorphism {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ------------------------------------------------
+   5. Navigation
+   ------------------------------------------------ */
+header nav {
+    transition: box-shadow 0.3s ease;
+}
+
+header nav img {
+    width: 16px;
+    height: 16px;
+}
+
+/* ------------------------------------------------
+   6. Hero Section
+   ------------------------------------------------ */
+.hero-section {
+    position: relative;
+    min-height: 70vh;
+}
+
+/* ------------------------------------------------
+   7. Cards & Hover Effects
+   ------------------------------------------------ */
+.word-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 1rem;
+}
+
+.word-card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.08),
+        0 8px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* ------------------------------------------------
+   8. Buttons
+   ------------------------------------------------ */
+
+/* Active Lesson Button */
+.btn-active {
     background-color: #422AD5;
     color: white;
+    box-shadow: 0 4px 14px rgba(66, 42, 213, 0.4);
+    transform: scale(1.05);
+}
+
+/* Hover Lift Effect */
+.btn-hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Lesson button transitions */
+.lesson-btn {
+    transition: all 0.2s ease;
+}
+
+.lesson-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* ------------------------------------------------
+   9. Back to Top
+   ------------------------------------------------ */
+.back-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 999;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: white;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5);
+}
+
+/* ------------------------------------------------
+   10. Footer
+   ------------------------------------------------ */
+footer a {
+    transition: color 0.2s ease;
+}
+
+.social-link {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.social-link:hover {
+    transform: scale(1.15);
+}
+
+/* ------------------------------------------------
+   11. Scrollbar
+   ------------------------------------------------ */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+    border-radius: 10px;
+    border: 2px solid #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #2563eb, #7c3aed);
+}
+
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #3b82f6 #f1f5f9;
+}
+
+/* ------------------------------------------------
+   12. Utilities
+   ------------------------------------------------ */
+
+/* Word count badge */
+.word-count-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+/* Modal gradient header override */
+.modal-box {
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+/* Synonym tag button in modal */
+.synonym-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    margin: 0.25rem;
+    border-radius: 9999px;
+    background-color: #ede9fe;
+    color: #6d28d9;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: background-color 0.2s ease;
+}
+
+.synonym-tag:hover {
+    background-color: #ddd6fe;
 }
