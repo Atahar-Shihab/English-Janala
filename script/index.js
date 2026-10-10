@@ -27,9 +27,9 @@
 const API_BASE = 'https://openapi.programming-hero.com/api';
 
 const state = {
-    allWords: [],
-    currentWords: [],
-    activeLessonId: null,
+    allWords: (typeof DEFAULT_VOCABULARY !== 'undefined' && Array.isArray(DEFAULT_VOCABULARY)) ? [...DEFAULT_VOCABULARY] : [],
+    currentWords: (typeof DEFAULT_VOCABULARY !== 'undefined' && Array.isArray(DEFAULT_VOCABULARY)) ? DEFAULT_VOCABULARY.filter(w => w.level_no === 1) : [],
+    activeLessonId: 1,
     isFetching: false,
     activeMode: 'browse', // 'browse' | 'flashcards' | 'quiz' | 'spelling' | 'memory'
     
@@ -478,24 +478,29 @@ const removeActiveClass = () => {
 };
 
 const loadLessons = async () => {
+    let levelsData = null;
     try {
         const res = await fetch(`${API_BASE}/levels/all`);
         const json = await res.json();
-        displayLessons(json.data || []);
-        
-        // Pre-fetch all words in background to enable lightning-fast search & games
-        fetchAllWordsInMemory();
-    } catch (error) {
-        console.error('Failed to load lessons:', error);
-        const container = document.getElementById('level-container');
-        if (container) {
-            container.innerHTML = `
-                <div class="text-error text-center py-4 text-sm font-semibold">
-                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Failed to connect. Please check internet connection.
-                </div>
-            `;
+        if (json && Array.isArray(json.data) && json.data.length > 0) {
+            levelsData = json.data;
         }
+    } catch (error) {
+        console.warn('Levels API offline or unreachable, switching to built-in dataset:', error);
     }
+
+    // Fail-safe offline/API downtime fallback
+    if (!levelsData || levelsData.length === 0) {
+        levelsData = (typeof DEFAULT_LEVELS !== 'undefined') ? DEFAULT_LEVELS : [];
+    }
+
+    displayLessons(levelsData);
+
+    // Pre-fetch all words in background to enable lightning-fast search & games
+    fetchAllWordsInMemory();
+
+    // Automatically load Lesson 1 immediately so cards are visible right away
+    loadLevelWord(1);
 };
 
 const displayLessons = (lessons) => {
@@ -526,10 +531,16 @@ const fetchAllWordsInMemory = async () => {
     try {
         const res = await fetch(`${API_BASE}/words/all`);
         const json = await res.json();
-        state.allWords = json.data || [];
-        initWordOfTheDay();
+        if (json && Array.isArray(json.data) && json.data.length > 0) {
+            state.allWords = json.data;
+        }
     } catch (e) {
-        console.warn('Memory word cache failed:', e);
+        console.warn('Memory word cache failed, relying on built-in dataset:', e);
+    } finally {
+        if (!state.allWords || state.allWords.length === 0) {
+            state.allWords = (typeof DEFAULT_VOCABULARY !== 'undefined') ? [...DEFAULT_VOCABULARY] : [];
+        }
+        initWordOfTheDay();
     }
 };
 
@@ -539,24 +550,33 @@ const loadLevelWord = async (levelNo) => {
     state.activeLessonId = levelNo;
     manageSpinner(true);
 
+    let words = [];
     try {
         const res = await fetch(`${API_BASE}/level/${levelNo}`);
         const json = await res.json();
-        const words = json.data || [];
-
-        removeActiveClass();
-        const activeBtn = document.getElementById(`lesson-${levelNo}`);
-        if (activeBtn) activeBtn.classList.add('btn-active');
-
-        state.currentWords = words;
-        renderWordsList(`Lesson ${levelNo}`);
-        updateDailyGoalProgress(1);
+        if (json && Array.isArray(json.data) && json.data.length > 0) {
+            words = json.data;
+        }
     } catch (error) {
-        console.error(`Failed to load level ${levelNo}:`, error);
-        manageSpinner(false);
-    } finally {
-        state.isFetching = false;
+        console.warn(`Level ${levelNo} API failed, falling back to built-in dataset:`, error);
     }
+
+    // Fail-safe offline/local fallback
+    if (!words || words.length === 0) {
+        const pool = (typeof DEFAULT_VOCABULARY !== 'undefined' && DEFAULT_VOCABULARY.length > 0)
+            ? DEFAULT_VOCABULARY
+            : state.allWords;
+        words = pool.filter(w => Number(w.level_no) === Number(levelNo));
+    }
+
+    removeActiveClass();
+    const activeBtn = document.getElementById(`lesson-${levelNo}`);
+    if (activeBtn) activeBtn.classList.add('btn-active');
+
+    state.currentWords = words;
+    renderWordsList(`Lesson ${levelNo}`);
+    updateDailyGoalProgress(1);
+    state.isFetching = false;
 };
 
 const loadAllWords = async () => {
@@ -569,20 +589,25 @@ const loadAllWords = async () => {
         if (state.allWords.length === 0) {
             const res = await fetch(`${API_BASE}/words/all`);
             const json = await res.json();
-            state.allWords = json.data || [];
+            if (json && Array.isArray(json.data) && json.data.length > 0) {
+                state.allWords = json.data;
+            }
         }
-        removeActiveClass();
-        const allBtn = document.getElementById('lesson-all');
-        if (allBtn) allBtn.classList.add('btn-active');
-
-        state.currentWords = [...state.allWords];
-        renderWordsList('All Lessons');
     } catch (error) {
-        console.error('Failed to load all words:', error);
-        manageSpinner(false);
-    } finally {
-        state.isFetching = false;
+        console.warn('All words API failed, using built-in dataset:', error);
     }
+
+    if (!state.allWords || state.allWords.length === 0) {
+        state.allWords = (typeof DEFAULT_VOCABULARY !== 'undefined') ? [...DEFAULT_VOCABULARY] : [];
+    }
+
+    removeActiveClass();
+    const allBtn = document.getElementById('lesson-all');
+    if (allBtn) allBtn.classList.add('btn-active');
+
+    state.currentWords = [...state.allWords];
+    renderWordsList('All Lessons');
+    state.isFetching = false;
 };
 
 // ==========================================================================
@@ -843,14 +868,30 @@ function resetLearningProgress() {
 // ==========================================================================
 
 const loadWordDetail = async (id) => {
+    let word = null;
     try {
         const res = await fetch(`${API_BASE}/word/${id}`);
         const json = await res.json();
-        state.activeModalWord = json.data;
-        displayWordDetails(json.data);
+        if (json && json.data && json.data.word) {
+            word = json.data;
+        }
     } catch (e) {
-        console.error('Word detail fetch error:', e);
-        alert('Could not fetch word details. Please check your connection.');
+        console.warn(`Word detail API fetch error for id ${id}:`, e);
+    }
+
+    // Fail-safe local lookup if API is offline or returns error
+    if (!word) {
+        const pool = (state.allWords && state.allWords.length > 0)
+            ? state.allWords
+            : ((typeof DEFAULT_VOCABULARY !== 'undefined') ? DEFAULT_VOCABULARY : []);
+        word = pool.find(w => String(w.id) === String(id));
+    }
+
+    if (word) {
+        state.activeModalWord = word;
+        displayWordDetails(word);
+    } else {
+        showToast('Word details unavailable.', 'warning');
     }
 };
 
@@ -999,15 +1040,23 @@ function switchAppMode(mode) {
 async function getActiveWordPool() {
     if (state.currentWords.length > 0) return state.currentWords;
     if (state.allWords.length > 0) return state.allWords;
+    if (typeof DEFAULT_VOCABULARY !== 'undefined' && DEFAULT_VOCABULARY.length > 0) {
+        state.allWords = [...DEFAULT_VOCABULARY];
+        state.currentWords = [...state.allWords];
+        return state.allWords;
+    }
     try {
         const res = await fetch(`${API_BASE}/words/all`);
         const json = await res.json();
-        state.allWords = json.data || [];
-        state.currentWords = [...state.allWords];
-        return state.allWords;
+        if (json && Array.isArray(json.data) && json.data.length > 0) {
+            state.allWords = json.data;
+            state.currentWords = [...state.allWords];
+            return state.allWords;
+        }
     } catch (e) {
-        return [];
+        console.warn('Word pool fetch failed:', e);
     }
+    return [];
 }
 
 async function startFlashcards() {

@@ -638,6 +638,65 @@
                             <p>হ্যাঁ, আপনার স্টার করা বুকমার্ক, পার্সোনাল নোটস, এবং ডেইলি স্ট্রিক সম্পূর্ণভাবে আপনার ব্রাউজারের লোকালস্টোরেজে সুরক্ষিতভাবে সংরক্ষিত থাকে।</p>
                         </div>
                     </div>
+
+                    <!-- Programming Hero Assignment JS Questions -->
+                    <div class="collapse collapse-plus bg-base-100 border border-base-300 rounded-xl">
+                        <input type="radio" name="my-accordion-3" />
+                        <div class="collapse-title text-base font-semibold">
+                            1. var, let এবং const এর মধ্যে মূল পার্থক্য কী?
+                        </div>
+                        <div class="collapse-content text-sm text-base-content/80 font-bangla space-y-2">
+                            <p><strong>var:</strong> Function-scoped এবং re-declare ও re-assign করা যায়। এটি hoisting এর সময় undefined দিয়ে ইনিশিয়ালাইজ হয়।</p>
+                            <p><strong>let:</strong> Block-scoped (`{}` এর মধ্যে সীমাবদ্ধ)। এটি re-assign করা যায় কিন্তু একই স্কোপে re-declare করা যায় না। TDZ (Temporal Dead Zone) বজায় রাখে।</p>
+                            <p><strong>const:</strong> Block-scoped। এটি re-declare কিংবা re-assign কোনটিই করা যায় না। একবার মান দিলে তা অপরিবর্তনীয় (immutable reference)।</p>
+                        </div>
+                    </div>
+
+                    <div class="collapse collapse-plus bg-base-100 border border-base-300 rounded-xl">
+                        <input type="radio" name="my-accordion-3" />
+                        <div class="collapse-title text-base font-semibold">
+                            2. map(), forEach() এবং filter() এর মধ্যে পার্থক্য কী?
+                        </div>
+                        <div class="collapse-content text-sm text-base-content/80 font-bangla space-y-2">
+                            <p><strong>map():</strong> একটি Array এর প্রতিটি এলিমেন্টের উপর কাজ করে নতুন একটি সমদৈর্ঘ্যের পরিবর্তিত Array রিটার্ন করে। মূল Array অপরিবর্তিত থাকে।</p>
+                            <p><strong>forEach():</strong> শুধুমাত্র প্রতিটি এলিমেন্টের উপর কোনো অপারেশন এক্সিকিউট করে। এটি নিজে থেকে কোনো নতুন Array রিটার্ন করে না (returns undefined)।</p>
+                            <p><strong>filter():</strong> একটি নির্দিষ্ট শর্তের (condition) ভিত্তিতে সত্য প্রমাণিত হওয়া এলিমেন্টগুলোকে নিয়ে নতুন একটি ছোট বা সমান দৈর্ঘ্যের Array রিটার্ন করে।</p>
+                        </div>
+                    </div>
+
+                    <div class="collapse collapse-plus bg-base-100 border border-base-300 rounded-xl">
+                        <input type="radio" name="my-accordion-3" />
+                        <div class="collapse-title text-base font-semibold">
+                            3. Arrow Function এবং Regular Function এর মধ্যে মূল পার্থক্য কী?
+                        </div>
+                        <div class="collapse-content text-sm text-base-content/80 font-bangla space-y-2">
+                            <p><strong>Syntax:</strong> Arrow Function এর সিনট্যাক্স অনেক সংক্ষিপ্ত ও ক্লিন (`() => {}`)। এক লাইনের হলে implicit return সাপোর্ট করে।</p>
+                            <p><strong>this Binding:</strong> Regular function এর নিজস্ব `this` কন্টেক্সট থাকে যা ফাংশনটি কীভাবে কল হয়েছে তার ওপর নির্ভর করে। কিন্তু Arrow function এর নিজস্ব `this` নেই—এটি তার প্যারেন্ট স্কোপ (Lexical Scoping) থেকে `this` ধার করে।</p>
+                            <p><strong>arguments Object:</strong> Regular function এ `arguments` অবজেক্ট থাকে, যা Arrow function এ সরাসরি থাকে না (সেক্ষেত্রে Rest parameter `...args` ব্যবহার করতে হয়)।</p>
+                        </div>
+                    </div>
+
+                    <div class="collapse collapse-plus bg-base-100 border border-base-300 rounded-xl">
+                        <input type="radio" name="my-accordion-3" />
+                        <div class="collapse-title text-base font-semibold">
+                            4. JavaScript Promise কী এবং কেন আমরা async/await ব্যবহার করি?
+                        </div>
+                        <div class="collapse-content text-sm text-base-content/80 font-bangla space-y-2">
+                            <p><strong>Promise:</strong> জাভাস্ক্রিপ্টে অ্যাসিনক্রোনাস (Asynchronous) অপারেশনের ভবিষ্যৎ ফলাফল নির্দেশ করে। এর তিনটি স্টেট থাকে: Pending, Fulfilled এবং Rejected। এটি Callback Hell সমস্যা দূর করে।</p>
+                            <p><strong>async/await:</strong> Promise এর উপর ভিত্তি করে তৈরি একটি Syntactic Sugar। `.then()` এবং `.catch()` এর চেইনিং এর তুলনায় `async/await` অ্যাসিনক্রোনাস কোডকে সিনক্রোনাস কোডের মতো সহজবোধ্য ও পাঠযোগ্য করে তোলে এবং `try...catch` দিয়ে সহজে এরর হ্যান্ডলিং সম্ভব হয়।</p>
+                        </div>
+                    </div>
+
+                    <div class="collapse collapse-plus bg-base-100 border border-base-300 rounded-xl">
+                        <input type="radio" name="my-accordion-3" />
+                        <div class="collapse-title text-base font-semibold">
+                            5. JavaScript Closure কী এবং এটি কীভাবে কাজ করে?
+                        </div>
+                        <div class="collapse-content text-sm text-base-content/80 font-bangla space-y-2">
+                            <p><strong>Closure:</strong> যখন কোনো ইনার (Inner) ফাংশন তার আউটার (Outer) ফাংশনের এক্সিকিউশন শেষ হয়ে যাওয়ার পরেও আউটার ফাংশনের স্কোপের ভেরিয়েবলগুলোকে মনে রাখতে পারে এবং অ্যাক্সেস করতে পারে, তখন তাকে Closure বলা হয়।</p>
+                            <p>এটি ডেটা প্রাইভেসী (Data Privacy), এনক্যাপসুলেশন, ফাংশন ফ্যাক্টরি এবং ইভেন্ট হ্যান্ডলার তৈরিতে ব্যাপকভাবে ব্যবহৃত হয়।</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -925,6 +984,9 @@
     <button id="btn-back-to-top" class="back-to-top" aria-label="Back to top" title="Back to top">
         <i class="fa-solid fa-arrow-up"></i>
     </button>
+
+    <!-- Built-in Comprehensive Vocabulary Dataset (Fail-Safe Offline/API fallback) -->
+    <script src="./data/vocabulary.js"></script>
 
     <!-- Application Script -->
     <script src="./script/index.js"></script>
