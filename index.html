@@ -147,6 +147,41 @@
         </nav>
     </header>
 
+    <!-- ============================== -->
+    <!-- Sticky Primary Mode Navigation -->
+    <!-- ============================== -->
+    <nav id="main-mode-navbar" class="sticky top-[65px] z-30 bg-base-100/95 backdrop-blur-md border-b border-base-200 shadow-xs py-2 px-4 transition-all">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-3 overflow-x-auto no-scrollbar">
+            <!-- Learning Mode Buttons -->
+            <div class="flex items-center gap-1.5 sm:gap-2">
+                <button data-mode="browse" onclick="switchAppMode('browse')" class="mode-nav-tab btn btn-sm rounded-full gap-2 transition-all active">
+                    <i class="fa-solid fa-book-open"></i> <span>Browse Words</span>
+                </button>
+                <button data-mode="flashcards" onclick="switchAppMode('flashcards')" class="mode-nav-tab btn btn-sm btn-ghost rounded-full gap-2 transition-all">
+                    <i class="fa-solid fa-clone text-secondary"></i> <span>3D Flashcards</span>
+                </button>
+                <button data-mode="quiz" onclick="switchAppMode('quiz')" class="mode-nav-tab btn btn-sm btn-ghost rounded-full gap-2 transition-all">
+                    <i class="fa-solid fa-trophy text-accent"></i> <span>Quiz Arena</span>
+                </button>
+                <button data-mode="spelling" onclick="switchAppMode('spelling')" class="mode-nav-tab btn btn-sm btn-ghost rounded-full gap-2 transition-all">
+                    <i class="fa-solid fa-keyboard text-info"></i> <span>Spelling Test</span>
+                </button>
+                <button data-mode="memory" onclick="switchAppMode('memory')" class="mode-nav-tab btn btn-sm btn-ghost rounded-full gap-2 transition-all">
+                    <i class="fa-solid fa-puzzle-piece text-success"></i> <span>Memory Match</span>
+                </button>
+                <button data-mode="bookmarks" onclick="filterBookmarks()" class="mode-nav-tab btn btn-sm btn-ghost rounded-full gap-2 transition-all">
+                    <i class="fa-solid fa-star text-warning"></i> <span>Saved Words</span>
+                </button>
+            </div>
+            <!-- Quick Keyboard Hotkey Tips -->
+            <div class="hidden lg:flex items-center gap-3 text-xs text-base-content/60">
+                <span class="inline-flex items-center gap-1"><kbd class="app-kbd">/</kbd> Search</span>
+                <span class="inline-flex items-center gap-1"><kbd class="app-kbd">Space</kbd> Flip</span>
+                <span class="inline-flex items-center gap-1"><kbd class="app-kbd">T</kbd> Theme</span>
+            </div>
+        </div>
+    </nav>
+
     <main class="flex-grow">
         <!-- ============================== -->
         <!-- Hero Section                   -->
@@ -255,17 +290,41 @@
         <!-- 1. FLASHCARDS ARENA VIEWPORT (Default hidden) -->
         <section id="flashcards-arena" class="hidden py-8 px-4 lg:px-8">
             <div class="max-w-2xl mx-auto">
-                <div class="flex items-center justify-between mb-4">
+                <!-- Flashcard Controls Header -->
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                     <button onclick="switchAppMode('browse')" class="btn btn-sm btn-ghost gap-1.5">
                         <i class="fa-solid fa-arrow-left"></i> Back to Browse
                     </button>
-                    <div class="flex items-center gap-2">
-                        <span id="fc-progress-counter" class="text-xs font-semibold text-base-content/70">Card 1 of 22</span>
-                        <button onclick="shuffleFlashcards()" class="btn btn-xs btn-outline gap-1">
+                    
+                    <div class="flex flex-wrap items-center gap-2">
+                        <!-- Deck Selector -->
+                        <select id="fc-lesson-select" onchange="changeFlashcardLesson(this.value)" class="select select-xs select-bordered rounded-xl text-xs font-semibold">
+                            <option value="all">All Lessons (140 Words)</option>
+                            <option value="1">Lesson 1: Foundations</option>
+                            <option value="2">Lesson 2: Growth</option>
+                            <option value="3">Lesson 3: Character</option>
+                            <option value="4">Lesson 4: Intermediate</option>
+                            <option value="5">Lesson 5: Advanced</option>
+                            <option value="6">Lesson 6: Academic</option>
+                            <option value="7">Lesson 7: Fluency</option>
+                            <option value="bookmarked">⭐ Saved Words</option>
+                        </select>
+
+                        <!-- Auto-Play Slideshow Button -->
+                        <button id="fc-autoplay-btn" onclick="toggleFlashcardAutoPlay()" class="btn btn-xs btn-outline btn-primary gap-1 rounded-xl" title="Auto-advance cards and pronounce">
+                            <i class="fa-solid fa-play"></i> <span>Auto-Play</span>
+                        </button>
+
+                        <button onclick="shuffleFlashcards()" class="btn btn-xs btn-outline gap-1 rounded-xl" title="Shuffle flashcards">
                             <i class="fa-solid fa-shuffle"></i> Shuffle
                         </button>
+
+                        <span id="fc-progress-counter" class="text-xs font-semibold text-base-content/70 ml-1">Card 1 of 20</span>
                     </div>
                 </div>
+
+                <!-- Progress Bar -->
+                <progress id="fc-progress-bar" class="progress progress-primary w-full h-1.5 mb-4 bg-base-300" value="1" max="20"></progress>
 
                 <!-- 3D Flippable Card -->
                 <div class="perspective-1000 w-full min-h-[340px]">
@@ -275,7 +334,10 @@
                             <!-- Front Side (English Word) -->
                             <div class="absolute inset-0 backface-hidden bg-base-100 rounded-3xl p-8 border-2 border-indigo-500/30 shadow-xl flex flex-col justify-between text-center items-center">
                                 <div class="w-full flex items-center justify-between text-xs text-base-content/50">
-                                    <span class="badge badge-sm badge-primary text-white font-semibold" id="fc-front-tag">Card</span>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="badge badge-sm badge-primary text-white font-semibold" id="fc-front-tag">Card</span>
+                                        <span class="badge badge-xs badge-neutral" id="fc-front-pos">Part of Speech</span>
+                                    </div>
                                     <span>Click card or press <kbd class="app-kbd">Space</kbd> to flip</span>
                                 </div>
 
@@ -292,7 +354,7 @@
                                 </div>
 
                                 <div class="w-full flex justify-center gap-3" onclick="event.stopPropagation()">
-                                    <button onclick="pronounceCurrentFlashcard()" class="btn btn-sm btn-primary text-white gap-2 rounded-full px-5">
+                                    <button id="fc-listen-btn" onclick="pronounceCurrentFlashcard()" class="btn btn-sm btn-primary text-white gap-2 rounded-full px-5 shadow-sm">
                                         <i class="fa-solid fa-volume-high"></i> Listen Pronunciation
                                     </button>
                                 </div>
@@ -301,22 +363,29 @@
                             <!-- Back Side (Bengali Meaning & Details) -->
                             <div class="absolute inset-0 backface-hidden rotate-y-180 bg-base-100 rounded-3xl p-8 border-2 border-purple-500/30 shadow-xl flex flex-col justify-between text-center items-center">
                                 <div class="w-full flex items-center justify-between text-xs text-base-content/50">
-                                    <span class="badge badge-sm badge-secondary text-white font-semibold">Meaning & Usage</span>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="badge badge-sm badge-secondary text-white font-semibold">Meaning & Usage</span>
+                                        <span class="badge badge-xs badge-neutral" id="fc-back-pos">Part of Speech</span>
+                                    </div>
                                     <span>Click to flip back</span>
                                 </div>
 
-                                <div class="my-auto space-y-3 w-full">
+                                <div class="my-auto space-y-2 w-full">
                                     <div class="py-1">
-                                        <p class="text-xs uppercase font-bold text-primary tracking-wider mb-1">Bengali Meaning</p>
-                                        <p id="fc-back-meaning" class="text-3xl font-bold font-bangla text-base-content">
+                                        <p class="text-[11px] uppercase font-bold text-primary tracking-wider mb-0.5">Bengali Meaning</p>
+                                        <p id="fc-back-meaning" class="text-2xl sm:text-3xl font-bold font-bangla text-base-content">
                                             আগ্রহী
                                         </p>
                                     </div>
-                                    <div class="bg-base-200/60 p-3 rounded-2xl text-sm italic text-base-content/80 max-w-md mx-auto">
-                                        "<span id="fc-back-sentence">He was eager to learn new words.</span>"
+                                    <div class="bg-base-200/60 p-3 rounded-2xl text-sm text-base-content/80 max-w-md mx-auto text-left">
+                                        <p class="italic text-base-content font-medium">"<span id="fc-back-sentence">He was eager to learn new words.</span>"</p>
+                                        <p id="fc-back-sentence-bn" class="text-xs text-base-content/70 font-bangla mt-1">তিনি নতুন শব্দ শিখতে আগ্রহী ছিলেন।</p>
                                     </div>
                                     <div id="fc-back-synonyms" class="flex flex-wrap justify-center gap-1.5 pt-1">
                                         <!-- Synonyms -->
+                                    </div>
+                                    <div id="fc-back-antonyms" class="flex flex-wrap justify-center gap-1.5">
+                                        <!-- Antonyms -->
                                     </div>
                                 </div>
 
@@ -358,9 +427,16 @@
         <section id="quiz-arena" class="hidden py-8 px-4 lg:px-8">
             <div class="max-w-2xl mx-auto bg-base-100 rounded-3xl p-6 sm:p-8 border border-base-300 shadow-xl">
                 <!-- Quiz Header -->
-                <div class="flex items-center justify-between pb-4 border-b border-base-200 mb-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-base-200 mb-4">
                     <div>
-                        <span class="badge badge-primary text-white font-bold text-xs" id="quiz-question-badge">Question 1 of 10</span>
+                        <div class="flex items-center gap-2">
+                            <span class="badge badge-primary text-white font-bold text-xs" id="quiz-question-badge">Question 1 of 10</span>
+                            <!-- Quiz Deck Selector -->
+                            <select id="quiz-lesson-select" onchange="changeQuizLesson(this.value)" class="select select-xs select-bordered rounded-lg text-xs font-semibold">
+                                <option value="current">Current Lesson</option>
+                                <option value="all">All 140 Words</option>
+                            </select>
+                        </div>
                         <h3 class="text-xl font-bold mt-1">Vocabulary Quiz</h3>
                     </div>
                     <div class="flex items-center gap-3">
@@ -374,9 +450,12 @@
                     </div>
                 </div>
 
+                <!-- Quiz Progress Bar -->
+                <progress id="quiz-progress-bar" class="progress progress-primary w-full h-1.5 mb-4 bg-base-200" value="1" max="10"></progress>
+
                 <!-- Quiz Question Box -->
                 <div id="quiz-question-box" class="space-y-6">
-                    <div class="text-center py-4">
+                    <div class="text-center py-2">
                         <p class="text-xs uppercase font-bold text-base-content/60 tracking-wider mb-2">What is the meaning of:</p>
                         <h2 id="quiz-question-word" class="text-4xl font-extrabold text-primary tracking-tight">Eager</h2>
                         <button onclick="pronounceWord(document.getElementById('quiz-question-word').innerText)" class="btn btn-xs btn-ghost gap-1 mt-2">
@@ -388,6 +467,8 @@
                     <div id="quiz-options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <!-- Injected dynamically -->
                     </div>
+
+                    <p class="text-center text-xs text-base-content/50">Tip: Click an option or press keys <kbd class="app-kbd">1</kbd>, <kbd class="app-kbd">2</kbd>, <kbd class="app-kbd">3</kbd>, or <kbd class="app-kbd">4</kbd> on your keyboard.</p>
 
                     <!-- Quiz Feedback Banner -->
                     <div id="quiz-feedback" class="min-h-[44px] flex items-center justify-center text-sm font-semibold rounded-xl"></div>
@@ -401,6 +482,13 @@
                     <h3 class="text-3xl font-extrabold">Quiz Completed!</h3>
                     <p class="text-lg text-base-content/80">You scored <span id="quiz-final-score" class="font-bold text-primary">0</span> out of <span id="quiz-total-questions" class="font-bold">10</span></p>
                     <div id="quiz-xp-awarded" class="badge badge-lg badge-success text-white font-bold p-3">+0 XP Earned</div>
+                    
+                    <!-- Missed Questions Review -->
+                    <div id="quiz-missed-list" class="text-left bg-base-200/60 p-4 rounded-2xl space-y-2 max-h-60 overflow-y-auto hidden">
+                        <p class="font-bold text-xs uppercase text-error tracking-wider mb-2"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Words to Review:</p>
+                        <div id="quiz-missed-items" class="space-y-1 text-xs"></div>
+                    </div>
+
                     <div class="pt-4 flex justify-center gap-3">
                         <button onclick="startQuiz()" class="btn btn-primary text-white gap-2 rounded-xl">
                             <i class="fa-solid fa-rotate-right"></i> Try Again
@@ -497,16 +585,43 @@
                     <!-- Dynamically generated lesson buttons -->
                 </div>
 
+                <!-- Current Active Lesson Overview & Quick Actions -->
+                <div id="lesson-overview-banner" class="bg-base-100 border border-base-300 rounded-2xl p-4 my-3 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg shrink-0 font-bold">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 id="current-lesson-title" class="font-bold text-base text-base-content">Lesson 1: Foundations & Daily Essentials</h3>
+                                <span id="current-lesson-badge" class="badge badge-sm badge-primary text-white">Beginner</span>
+                            </div>
+                            <p id="current-lesson-desc" class="text-xs text-base-content/70 mt-0.5">20 words available with Bengali meanings, pronunciations & examples.</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                        <button onclick="practiceCurrentLesson('flashcards')" class="btn btn-xs sm:btn-sm btn-outline btn-secondary gap-1.5 rounded-xl flex-1 sm:flex-initial" title="Practice this lesson in 3D Flashcards">
+                            <i class="fa-solid fa-clone"></i> Practice Cards
+                        </button>
+                        <button onclick="practiceCurrentLesson('quiz')" class="btn btn-xs sm:btn-sm btn-outline btn-accent gap-1.5 rounded-xl flex-1 sm:flex-initial" title="Take a quiz on this lesson">
+                            <i class="fa-solid fa-trophy"></i> Quiz Lesson
+                        </button>
+                        <button onclick="exportCurrentWordList()" class="btn btn-xs sm:btn-sm btn-ghost gap-1.5 rounded-xl" title="Export this lesson's vocabulary as text">
+                            <i class="fa-solid fa-file-export"></i> Export
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Search, Filter & View Controls Toolbar -->
-                <div class="bg-base-100 border border-base-300 rounded-2xl p-4 my-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="bg-base-100 border border-base-300 rounded-2xl p-4 my-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
                     
                     <!-- Search Input Box -->
                     <div class="w-full md:max-w-md">
                         <div class="join w-full">
                             <div class="relative w-full">
                                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-base-content/40 text-sm"></i>
-                                <input id="input-search" type="text" placeholder="Search by English word or বাংলা অর্থ..." class="input input-sm input-bordered w-full pl-9 pr-8 rounded-l-xl focus:outline-none" />
-                                <button id="clear-search-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-base-content/40 hover:text-base-content" onclick="clearSearchInput()" title="Clear search">✕</button>
+                                <input id="input-search" type="text" placeholder="Live search: English word, pronunciation, or বাংলা অর্থ..." class="input input-sm input-bordered w-full pl-9 pr-8 rounded-l-xl focus:outline-none" />
+                                <button id="clear-search-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-base-content/40 hover:text-base-content text-sm" onclick="clearSearchInput()" title="Clear search">✕</button>
                             </div>
                             <button id="btn-search" class="btn btn-sm btn-primary join-item px-5 text-white">
                                 Search
@@ -514,20 +629,20 @@
                         </div>
                     </div>
 
-                    <!-- Right Controls: Sort & View Toggle -->
+                    <!-- Right Controls: Filters, Sort & View Toggle -->
                     <div class="flex flex-wrap items-center justify-end gap-2 w-full md:w-auto">
-                        <!-- Sort Dropdown -->
+                        <!-- Part of Speech Dropdown -->
                         <div class="dropdown dropdown-end">
                             <div tabindex="0" role="button" class="btn btn-sm btn-ghost border border-base-300 gap-1.5 text-xs font-semibold">
-                                <i class="fa-solid fa-arrow-down-a-z"></i>
-                                <span id="current-sort-label">Sort: Default</span>
+                                <i class="fa-solid fa-tags"></i>
+                                <span id="current-pos-label">Part of Speech: All</span>
                             </div>
                             <ul tabindex="-1" class="dropdown-content menu menu-sm bg-base-100 rounded-box z-30 w-44 p-2 shadow-xl border border-base-200">
-                                <li><a onclick="setSortMode('default')">Default Order</a></li>
-                                <li><a onclick="setSortMode('az')">Alphabetical (A - Z)</a></li>
-                                <li><a onclick="setSortMode('za')">Alphabetical (Z - A)</a></li>
-                                <li><a onclick="setSortMode('shortest')">Shortest Words</a></li>
-                                <li><a onclick="setSortMode('longest')">Longest Words</a></li>
+                                <li><a onclick="setPosFilter('all')">All Parts</a></li>
+                                <li><a onclick="setPosFilter('Noun')">Noun (বিশেষ্য)</a></li>
+                                <li><a onclick="setPosFilter('Verb')">Verb (ক্রিয়া)</a></li>
+                                <li><a onclick="setPosFilter('Adjective')">Adjective (বিশেষণ)</a></li>
+                                <li><a onclick="setPosFilter('Adverb')">Adverb (ভাব বিশেষণ)</a></li>
                             </ul>
                         </div>
 
@@ -544,6 +659,21 @@
                                 <li><a onclick="setFilterMode('hard')">Hard (9+ chars)</a></li>
                                 <li><a onclick="setFilterMode('bookmarked')">⭐ Bookmarked</a></li>
                                 <li><a onclick="setFilterMode('mastered')">✅ Mastered</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Sort Dropdown -->
+                        <div class="dropdown dropdown-end">
+                            <div tabindex="0" role="button" class="btn btn-sm btn-ghost border border-base-300 gap-1.5 text-xs font-semibold">
+                                <i class="fa-solid fa-arrow-down-a-z"></i>
+                                <span id="current-sort-label">Sort: Default</span>
+                            </div>
+                            <ul tabindex="-1" class="dropdown-content menu menu-sm bg-base-100 rounded-box z-30 w-44 p-2 shadow-xl border border-base-200">
+                                <li><a onclick="setSortMode('default')">Default Order</a></li>
+                                <li><a onclick="setSortMode('az')">Alphabetical (A - Z)</a></li>
+                                <li><a onclick="setSortMode('za')">Alphabetical (Z - A)</a></li>
+                                <li><a onclick="setSortMode('shortest')">Shortest Words</a></li>
+                                <li><a onclick="setSortMode('longest')">Longest Words</a></li>
                             </ul>
                         </div>
 

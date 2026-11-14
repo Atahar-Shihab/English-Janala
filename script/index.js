@@ -57,13 +57,15 @@ const state = {
     // Filter & Layout
     sortMode: 'default',
     filterMode: 'all',
+    posFilter: 'all', // 'all' | 'Noun' | 'Verb' | 'Adjective' | 'Adverb'
     viewLayout: localStorage.getItem('ej_view_layout') || 'grid',
     
     // Flashcard State
     flashcards: {
         list: [],
         index: 0,
-        flipped: false
+        flipped: false,
+        autoPlayTimer: null
     },
     
     // Quiz State
@@ -71,7 +73,9 @@ const state = {
         questions: [],
         currentIndex: 0,
         score: 0,
-        answered: false
+        answered: false,
+        lessonMode: 'current',
+        missedQuestions: []
     },
     
     // Spelling State
@@ -185,9 +189,11 @@ function playAudioSfx(type) {
 // 3. Web Speech API (Pronunciation Audio Engine)
 // ==========================================================================
 
-function pronounceWord(word) {
+function pronounceWord(word, btnEl = null) {
     if (!word || !('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
+
+    if (btnEl) btnEl.classList.add('speaking-pulse');
 
     let timesPlayed = 0;
     const playOnce = () => {
@@ -204,7 +210,13 @@ function pronounceWord(word) {
             timesPlayed++;
             if (timesPlayed < state.audio.repeat) {
                 setTimeout(playOnce, 300);
+            } else {
+                if (btnEl) btnEl.classList.remove('speaking-pulse');
             }
+        };
+
+        utterance.onerror = () => {
+            if (btnEl) btnEl.classList.remove('speaking-pulse');
         };
 
         window.speechSynthesis.speak(utterance);
@@ -478,12 +490,21 @@ const removeActiveClass = () => {
 };
 
 const loadLessons = async () => {
+    // Instant zero-latency render from built-in levels dataset
+    if (typeof DEFAULT_LEVELS !== 'undefined' && DEFAULT_LEVELS.length > 0) {
+        displayLessons(DEFAULT_LEVELS);
+    }
+    if (typeof DEFAULT_VOCABULARY !== 'undefined' && DEFAULT_VOCABULARY.length > 0) {
+        state.allWords = [...DEFAULT_VOCABULARY];
+    }
+
     let levelsData = null;
     try {
         const res = await fetch(`${API_BASE}/levels/all`);
         const json = await res.json();
         if (json && Array.isArray(json.data) && json.data.length > 0) {
             levelsData = json.data;
+            displayLessons(levelsData);
         }
     } catch (error) {
         console.warn('Levels API offline or unreachable, switching to built-in dataset:', error);
@@ -493,8 +514,6 @@ const loadLessons = async () => {
     if (!levelsData || levelsData.length === 0) {
         levelsData = (typeof DEFAULT_LEVELS !== 'undefined') ? DEFAULT_LEVELS : [];
     }
-
-    displayLessons(levelsData);
 
     // Pre-fetch all words in background to enable lightning-fast search & games
     fetchAllWordsInMemory();
@@ -527,18 +546,63 @@ const displayLessons = (lessons) => {
     });
 };
 
+function enrichWordData(word) {
+    if (!word) return word;
+    if (typeof DEFAULT_VOCABULARY === 'undefined' || !DEFAULT_VOCABULARY.length) {
+        return {
+            ...word,
+            part_of_speech: word.part_of_speech || 'Noun',
+            sentence: word.sentence || '',
+            sentence_bn: word.sentence_bn || '',
+            synonyms: word.synonyms || [],
+            antonyms: word.antonyms || []
+        };
+    }
+    const match = DEFAULT_VOCABULARY.find(v => (v.word || '').toLowerCase() === (word.word || '').toLowerCase());
+    if (!match) {
+        return {
+            ...word,
+            part_of_speech: word.part_of_speech || 'Noun',
+            sentence: word.sentence || '',
+            sentence_bn: word.sentence_bn || '',
+            synonyms: word.synonyms || [],
+            antonyms: word.antonyms || []
+        };
+    }
+    return {
+        ...match,
+        ...word,
+        part_of_speech: word.part_of_speech || match.part_of_speech || 'Noun',
+        pronunciation: word.pronunciation || match.pronunciation || '',
+        meaning: word.meaning || match.meaning || '',
+        sentence: word.sentence || match.sentence || '',
+        sentence_bn: word.sentence_bn || match.sentence_bn || '',
+        synonyms: (word.synonyms && word.synonyms.length) ? word.synonyms : (match.synonyms || []),
+        antonyms: (word.antonyms && word.antonyms.length) ? word.antonyms : (match.antonyms || [])
+    };
+}
+
 const fetchAllWordsInMemory = async () => {
     try {
         const res = await fetch(`${API_BASE}/words/all`);
         const json = await res.json();
         if (json && Array.isArray(json.data) && json.data.length > 0) {
-            state.allWords = json.data;
+            state.allWords = json.data.map(enrichWordData);
         }
     } catch (e) {
         console.warn('Memory word cache failed, relying on built-in dataset:', e);
     } finally {
-        if (!state.allWords || state.allWords.length === 0) {
-            state.allWords = (typeof DEFAULT_VOCABULARY !== 'undefined') ? [...DEFAULT_VOCABULARY] : [];
+        if (typeof DEFAULT_VOCABULARY !== 'undefined' && DEFAULT_VOCABULARY.length > 0) {
+            if (!state.allWords || state.allWords.length === 0) {
+                state.allWords = [...DEFAULT_VOCABULARY];
+            } else {
+                // Ensure all 140 words from DEFAULT_VOCABULARY are included
+                DEFAULT_VOCABULARY.forEach(dw => {
+                    if (!state.allWords.some(w => (w.word || '').toLowerCase() === dw.word.toLowerCase())) {
+                        state.allWords.push(dw);
+                    }
+                });
+            }
         }
         initWordOfTheDay();
     }
@@ -555,7 +619,7 @@ const loadLevelWord = async (levelNo) => {
         const res = await fetch(`${API_BASE}/level/${levelNo}`);
         const json = await res.json();
         if (json && Array.isArray(json.data) && json.data.length > 0) {
-            words = json.data;
+            words = json.data.map(enrichWordData);
         }
     } catch (error) {
         console.warn(`Level ${levelNo} API failed, falling back to built-in dataset:`, error);
@@ -567,6 +631,13 @@ const loadLevelWord = async (levelNo) => {
             ? DEFAULT_VOCABULARY
             : state.allWords;
         words = pool.filter(w => Number(w.level_no) === Number(levelNo));
+    } else if (typeof DEFAULT_VOCABULARY !== 'undefined' && DEFAULT_VOCABULARY.length > 0) {
+        const defaultForLevel = DEFAULT_VOCABULARY.filter(w => Number(w.level_no) === Number(levelNo));
+        defaultForLevel.forEach(dw => {
+            if (!words.some(w => (w.word || '').toLowerCase() === dw.word.toLowerCase())) {
+                words.push(dw);
+            }
+        });
     }
 
     removeActiveClass();
@@ -574,6 +645,7 @@ const loadLevelWord = async (levelNo) => {
     if (activeBtn) activeBtn.classList.add('btn-active');
 
     state.currentWords = words;
+    updateLessonOverviewBanner(levelNo);
     renderWordsList(`Lesson ${levelNo}`);
     updateDailyGoalProgress(1);
     state.isFetching = false;
@@ -590,7 +662,7 @@ const loadAllWords = async () => {
             const res = await fetch(`${API_BASE}/words/all`);
             const json = await res.json();
             if (json && Array.isArray(json.data) && json.data.length > 0) {
-                state.allWords = json.data;
+                state.allWords = json.data.map(enrichWordData);
             }
         }
     } catch (error) {
@@ -599,6 +671,12 @@ const loadAllWords = async () => {
 
     if (!state.allWords || state.allWords.length === 0) {
         state.allWords = (typeof DEFAULT_VOCABULARY !== 'undefined') ? [...DEFAULT_VOCABULARY] : [];
+    } else if (typeof DEFAULT_VOCABULARY !== 'undefined' && DEFAULT_VOCABULARY.length > 0) {
+        DEFAULT_VOCABULARY.forEach(dw => {
+            if (!state.allWords.some(w => (w.word || '').toLowerCase() === dw.word.toLowerCase())) {
+                state.allWords.push(dw);
+            }
+        });
     }
 
     removeActiveClass();
@@ -606,9 +684,79 @@ const loadAllWords = async () => {
     if (allBtn) allBtn.classList.add('btn-active');
 
     state.currentWords = [...state.allWords];
+    updateLessonOverviewBanner('all');
     renderWordsList('All Lessons');
     state.isFetching = false;
 };
+
+function updateLessonOverviewBanner(levelNo) {
+    const titleEl = document.getElementById('current-lesson-title');
+    const badgeEl = document.getElementById('current-lesson-badge');
+    const descEl = document.getElementById('current-lesson-desc');
+    if (!titleEl) return;
+
+    if (levelNo === 'all') {
+        titleEl.innerText = 'All Words: Complete Vocabulary Deck';
+        if (badgeEl) {
+            badgeEl.innerText = `${state.allWords.length} Words`;
+            badgeEl.className = 'badge badge-sm badge-primary text-white';
+        }
+        if (descEl) descEl.innerText = 'Browse, filter, and practice vocabulary across all 7 lessons.';
+        return;
+    }
+
+    const descriptions = {
+        1: { title: 'Lesson 1: Foundations & Daily Essentials', badge: 'Beginner', desc: 'Core daily words with Bengali meanings, pronunciations & examples.' },
+        2: { title: 'Lesson 2: Growth & Positive Actions', badge: 'Elementary', desc: 'Action verbs and uplifting terms for personal growth and habit building.' },
+        3: { title: 'Lesson 3: Character & Virtues', badge: 'Intermediate', desc: 'Qualities of integrity, empathy, and positive human values.' },
+        4: { title: 'Lesson 4: Intermediate Expressions', badge: 'Intermediate', desc: 'Expressive vocabulary to formulate structured, clear sentences.' },
+        5: { title: 'Lesson 5: Advanced Communication', badge: 'Advanced', desc: 'Nuanced vocabulary for persuasive speaking, debates, and presentations.' },
+        6: { title: 'Lesson 6: Academic & Mastery', badge: 'Mastery', desc: 'Academic and formal words frequently appearing in IELTS, GRE, and literature.' },
+        7: { title: 'Lesson 7: Idioms & Fluency', badge: 'Fluency', desc: 'Poetic, expressive, and evocative English terms to speak like a native.' }
+    };
+
+    const count = state.allWords.filter(w => Number(w.level_no) === Number(levelNo)).length;
+    const info = descriptions[levelNo] || { title: `Lesson ${levelNo}`, badge: 'Lesson', desc: 'Explore vocabulary words.' };
+    titleEl.innerText = info.title;
+    if (badgeEl) {
+        badgeEl.innerText = `${info.badge} (${count || 20})`;
+        badgeEl.className = 'badge badge-sm badge-primary text-white';
+    }
+    if (descEl) descEl.innerText = info.desc;
+}
+
+function practiceCurrentLesson(mode) {
+    if (mode === 'flashcards') {
+        switchAppMode('flashcards');
+        const sel = document.getElementById('fc-lesson-select');
+        if (sel) {
+            sel.value = state.activeLessonId ? String(state.activeLessonId) : 'all';
+            changeFlashcardLesson(sel.value);
+        }
+    } else if (mode === 'quiz') {
+        switchAppMode('quiz');
+        const sel = document.getElementById('quiz-lesson-select');
+        if (sel) {
+            sel.value = 'current';
+            changeQuizLesson('current');
+        }
+    }
+}
+
+function setPosFilter(pos) {
+    state.posFilter = pos;
+    const labels = {
+        all: 'Part of Speech: All',
+        Noun: 'Part: Noun (বিশেষ্য)',
+        Verb: 'Part: Verb (ক্রিয়া)',
+        Adjective: 'Part: Adjective (বিশেষণ)',
+        Adverb: 'Part: Adverb (ভাব বিশেষণ)'
+    };
+    const labelEl = document.getElementById('current-pos-label');
+    if (labelEl) labelEl.innerText = labels[pos] || 'Part of Speech: All';
+    renderWordsList(state.activeLessonId ? `Lesson ${state.activeLessonId}` : 'Browse');
+    showToast(`Filter: ${labels[pos] || pos}`, 'info');
+}
 
 // ==========================================================================
 // 9. Vocabulary List Rendering (Grid vs List Layout)
@@ -616,6 +764,11 @@ const loadAllWords = async () => {
 
 function getProcessedWords() {
     let list = [...state.currentWords];
+
+    // Part of speech filter
+    if (state.posFilter && state.posFilter !== 'all') {
+        list = list.filter(w => w.part_of_speech && w.part_of_speech.toLowerCase() === state.posFilter.toLowerCase());
+    }
 
     // Filter
     if (state.filterMode === 'easy') {
@@ -697,6 +850,7 @@ function renderWordsList(contextTitle = '') {
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-base text-base-content">${word.word}</span>
+                            ${word.part_of_speech ? `<span class="badge badge-xs badge-neutral font-medium">${word.part_of_speech}</span>` : ''}
                             <span class="text-xs font-mono text-base-content/50">${word.pronunciation ? `/${word.pronunciation}/` : ''}</span>
                             <span class="badge badge-xs ${diff.class}">${diff.label}</span>
                         </div>
@@ -705,8 +859,11 @@ function renderWordsList(contextTitle = '') {
                 </div>
 
                 <div class="flex items-center gap-2">
+                    <button onclick="copyWordText('${word.word}')" class="btn btn-xs btn-ghost btn-circle" title="Copy word">
+                        <i class="fa-regular fa-copy text-xs"></i>
+                    </button>
                     <button onclick="loadWordDetail(${word.id})" class="btn btn-xs btn-outline btn-primary rounded-lg">Details</button>
-                    <button onclick="pronounceWord('${word.word}')" class="btn btn-xs btn-primary text-white rounded-lg gap-1">
+                    <button onclick="pronounceWord('${word.word}', this)" class="btn btn-xs btn-primary text-white rounded-lg gap-1 shadow-xs">
                         <i class="fa-solid fa-volume-high"></i> Listen
                     </button>
                 </div>
@@ -729,9 +886,13 @@ function renderWordsList(contextTitle = '') {
                     <div class="flex items-start justify-between gap-2 mb-1.5">
                         <div class="flex items-center gap-2">
                             <h3 class="text-2xl font-extrabold text-base-content tracking-tight">${word.word}</h3>
+                            ${word.part_of_speech ? `<span class="badge badge-xs badge-neutral font-medium">${word.part_of_speech}</span>` : ''}
                             <span class="badge badge-xs ${diff.class}">${diff.label}</span>
                         </div>
                         <div class="flex items-center gap-1">
+                            <button onclick="copyWordText('${word.word}')" class="btn btn-xs btn-circle btn-ghost" title="Copy word">
+                                <i class="fa-regular fa-copy text-xs"></i>
+                            </button>
                             <button onclick="toggleBookmark(${word.id})" class="btn btn-xs btn-circle btn-ghost" title="Star word">
                                 <i class="${isBookmarked ? 'fa-solid text-warning' : 'fa-regular text-base-content/40'} fa-star text-sm"></i>
                             </button>
@@ -757,7 +918,7 @@ function renderWordsList(contextTitle = '') {
                     <button onclick="loadWordDetail(${word.id})" class="btn btn-xs btn-outline btn-primary gap-1.5 rounded-lg px-3">
                         <i class="fa-solid fa-circle-info"></i> Details
                     </button>
-                    <button onclick="pronounceWord('${word.word}')" class="btn btn-xs btn-primary text-white gap-1.5 rounded-lg px-3 shadow-sm">
+                    <button onclick="pronounceWord('${word.word}', this)" class="btn btn-xs btn-primary text-white gap-1.5 rounded-lg px-3 shadow-xs">
                         <i class="fa-solid fa-volume-high"></i> Listen
                     </button>
                 </div>
@@ -920,14 +1081,17 @@ const displayWordDetails = (word) => {
     detailsBox.innerHTML = `
         <div class="flex items-start justify-between border-b border-base-200 pb-3">
             <div>
-                <h2 class="text-3xl font-extrabold text-base-content tracking-tight">${word.word}</h2>
-                <div class="flex items-center gap-2 text-xs font-mono text-base-content/60 mt-0.5">
+                <div class="flex items-center gap-2">
+                    <h2 class="text-3xl font-extrabold text-base-content tracking-tight">${word.word}</h2>
+                    ${word.part_of_speech ? `<span class="badge badge-sm badge-primary text-white font-medium">${word.part_of_speech}</span>` : ''}
+                </div>
+                <div class="flex items-center gap-2 text-xs font-mono text-base-content/60 mt-1">
                     <span>${word.pronunciation ? `/${word.pronunciation}/` : ''}</span>
                     <span>•</span>
                     <span class="text-indigo-500 font-bold uppercase tracking-wider">${syllables}</span>
                 </div>
             </div>
-            <button onclick="pronounceWord('${word.word}')" class="btn btn-sm btn-circle btn-primary text-white" title="Pronounce word">
+            <button onclick="pronounceWord('${word.word}', this)" class="btn btn-sm btn-circle btn-primary text-white shadow-xs" title="Pronounce word">
                 <i class="fa-solid fa-volume-high"></i>
             </button>
         </div>
@@ -941,20 +1105,28 @@ const displayWordDetails = (word) => {
             </div>
 
             <div>
-                <h4 class="text-xs uppercase font-bold text-primary tracking-wider mb-1">Example Sentence</h4>
-                <p class="text-sm italic text-base-content/80 bg-base-200/50 p-3 rounded-2xl border border-base-300">
-                    "${word.sentence || 'No example available.'}"
-                </p>
-            </div>
-
-            <div>
-                <h4 class="text-xs uppercase font-bold text-primary tracking-wider mb-1">Synonyms (সমার্থক শব্দ)</h4>
-                <div class="flex flex-wrap gap-1">
-                    ${(word.synonyms && word.synonyms.length) 
-                        ? word.synonyms.map(s => `<span class="synonym-tag" onclick="quickSearchWord('${s}')">${s}</span>`).join('') 
-                        : '<span class="text-xs text-base-content/50 italic">No synonyms available</span>'}
+                <h4 class="text-xs uppercase font-bold text-primary tracking-wider mb-1">Example Sentence & Bengali Translation</h4>
+                <div class="bg-base-200/50 p-3.5 rounded-2xl border border-base-300 space-y-1">
+                    <p class="text-sm font-medium italic text-base-content">"${word.sentence || 'No example available.'}"</p>
+                    ${word.sentence_bn ? `<p class="text-xs text-base-content/75 font-bangla pt-0.5">${word.sentence_bn}</p>` : ''}
                 </div>
             </div>
+
+            ${(word.synonyms && word.synonyms.length) ? `
+            <div>
+                <h4 class="text-xs uppercase font-bold text-primary tracking-wider mb-1.5">Synonyms (সমার্থক শব্দ)</h4>
+                <div class="flex flex-wrap gap-1.5">
+                    ${word.synonyms.map(s => `<span class="synonym-tag cursor-pointer" onclick="quickSearchWord('${s}')">${s}</span>`).join('')}
+                </div>
+            </div>` : ''}
+
+            ${(word.antonyms && word.antonyms.length) ? `
+            <div>
+                <h4 class="text-xs uppercase font-bold text-secondary tracking-wider mb-1.5">Antonyms (বিপরীত শব্দ)</h4>
+                <div class="flex flex-wrap gap-1.5">
+                    ${word.antonyms.map(a => `<span onclick="quickSearchWord('${a}')" class="badge badge-sm badge-outline badge-secondary cursor-pointer hover:badge-secondary">${a}</span>`).join('')}
+                </div>
+            </div>` : ''}
         </div>
     `;
 
@@ -978,10 +1150,17 @@ function saveWordPersonalNote() {
     localStorage.setItem('ej_notes', JSON.stringify(state.notes));
 }
 
+function copyWordText(wordText) {
+    if (!wordText) return;
+    navigator.clipboard.writeText(wordText).then(() => {
+        showToast(`Copied "${wordText}" to clipboard! 📋`, 'success');
+    });
+}
+
 function copyCurrentWordToClipboard() {
     if (!state.activeModalWord) return;
     const w = state.activeModalWord;
-    const text = `${w.word} [/${w.pronunciation}/]\nMeaning: ${w.meaning}\nExample: "${w.sentence}"\nLearned via English Janala`;
+    const text = `${w.word} [/${w.pronunciation}/] (${w.part_of_speech || 'Word'})\nMeaning: ${w.meaning}\nExample: "${w.sentence}"\nBengali: ${w.sentence_bn || ''}\nLearned via English Janala`;
     navigator.clipboard.writeText(text).then(() => {
         showToast('Copied to clipboard! 📋', 'success');
     });
@@ -992,6 +1171,10 @@ function copyCurrentWordToClipboard() {
 // ==========================================================================
 
 function switchAppMode(mode) {
+    if (state.activeMode === 'flashcards' && mode !== 'flashcards') {
+        stopFlashcardAutoPlay();
+    }
+
     state.activeMode = mode;
     playAudioSfx('flip');
 
@@ -1005,6 +1188,13 @@ function switchAppMode(mode) {
     // Update floating dock active state
     document.querySelectorAll('.dock-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`dock-btn-${mode}`)?.classList.add('active');
+
+    // Update sticky mode nav tabs
+    document.querySelectorAll('.mode-nav-tab').forEach(tab => {
+        const isMatch = tab.dataset.mode === mode || (mode === 'browse' && tab.dataset.mode === 'browse');
+        tab.classList.toggle('active', isMatch);
+        tab.classList.toggle('btn-ghost', !isMatch);
+    });
 
     if (mode === 'flashcards') {
         const el = document.getElementById('flashcards-arena');
@@ -1060,15 +1250,82 @@ async function getActiveWordPool() {
 }
 
 async function startFlashcards() {
-    const pool = await getActiveWordPool();
+    const select = document.getElementById('fc-lesson-select');
+    const lessonVal = select ? select.value : 'all';
+    changeFlashcardLesson(lessonVal);
+}
+
+function changeFlashcardLesson(val) {
+    let pool = [];
+    if (val === 'all') {
+        pool = state.allWords.length ? state.allWords : state.currentWords;
+    } else if (val === 'bookmarked') {
+        pool = state.allWords.filter(w => state.bookmarks.includes(w.id));
+        if (!pool.length) {
+            showToast('No saved words found! Showing all words.', 'warning');
+            pool = state.allWords;
+        }
+    } else {
+        const levelNum = Number(val);
+        pool = state.allWords.filter(w => Number(w.level_no) === levelNum);
+        if (!pool.length) pool = state.currentWords;
+    }
+
     if (!pool.length) {
-        showToast('Please check your internet connection!', 'warning');
+        showToast('No words available for this deck.', 'warning');
         return;
     }
+
     state.flashcards.list = [...pool];
     state.flashcards.index = 0;
     state.flashcards.flipped = false;
     renderCurrentFlashcard();
+}
+
+function toggleFlashcardAutoPlay() {
+    if (state.flashcards.autoPlayTimer) {
+        stopFlashcardAutoPlay();
+    } else {
+        startFlashcardAutoPlay();
+    }
+}
+
+function startFlashcardAutoPlay() {
+    stopFlashcardAutoPlay();
+    const btn = document.getElementById('fc-autoplay-btn');
+    if (btn) {
+        btn.classList.add('autoplay-pulsing', 'btn-primary');
+        btn.classList.remove('btn-outline');
+        btn.innerHTML = `<i class="fa-solid fa-pause"></i> <span>Pause</span>`;
+    }
+    showToast('Auto-Play started (3.5s slideshow) ▶️', 'info');
+
+    // Auto-advance loop: after 1.8s flip card, after 3.5s advance to next card
+    state.flashcards.autoPlayTimer = setInterval(() => {
+        if (!state.flashcards.flipped) {
+            flipFlashcard();
+            setTimeout(() => {
+                if (state.flashcards.autoPlayTimer) {
+                    nextFlashcard();
+                }
+            }, 1700);
+        } else {
+            nextFlashcard();
+        }
+    }, 3500);
+}
+
+function stopFlashcardAutoPlay() {
+    if (state.flashcards.autoPlayTimer) {
+        clearInterval(state.flashcards.autoPlayTimer);
+        state.flashcards.autoPlayTimer = null;
+    }
+    const btn = document.getElementById('fc-autoplay-btn');
+    if (btn) {
+        btn.classList.remove('autoplay-pulsing', 'btn-primary');
+        btn.classList.add('btn-outline');
+        btn.innerHTML = `<i class="fa-solid fa-play"></i> <span>Auto-Play</span>`;
+    }
 }
 
 function flipFlashcard() {
@@ -1090,18 +1347,44 @@ function renderCurrentFlashcard() {
     const cardEl = document.getElementById('flashcard-element');
     if (cardEl) cardEl.classList.remove('flipped');
 
-    // Counter
-    document.getElementById('fc-progress-counter').innerText = `Card ${idx + 1} of ${list.length}`;
-    document.getElementById('fc-front-tag').innerText = `Word #${idx + 1}`;
+    // Counter & Progress Bar
+    const counterEl = document.getElementById('fc-progress-counter');
+    if (counterEl) counterEl.innerText = `Card ${idx + 1} of ${list.length}`;
+    
+    const progressBar = document.getElementById('fc-progress-bar');
+    if (progressBar) {
+        progressBar.max = list.length;
+        progressBar.value = idx + 1;
+    }
+
+    const frontTag = document.getElementById('fc-front-tag');
+    if (frontTag) frontTag.innerText = `Word #${idx + 1}`;
+
+    const frontPos = document.getElementById('fc-front-pos');
+    if (frontPos) frontPos.innerText = word.part_of_speech || 'Word';
 
     // Front content
-    document.getElementById('fc-front-word').innerText = word.word || '';
-    document.getElementById('fc-front-pronunciation').innerText = word.pronunciation ? `/${word.pronunciation}/` : '';
-    document.getElementById('fc-syllables').innerText = getSyllableBreakdown(word.word);
+    const frontWord = document.getElementById('fc-front-word');
+    if (frontWord) frontWord.innerText = word.word || '';
+
+    const frontPron = document.getElementById('fc-front-pronunciation');
+    if (frontPron) frontPron.innerText = word.pronunciation ? `/${word.pronunciation}/` : '';
+
+    const syllablesEl = document.getElementById('fc-syllables');
+    if (syllablesEl) syllablesEl.innerText = getSyllableBreakdown(word.word);
 
     // Back content
-    document.getElementById('fc-back-meaning').innerText = word.meaning || '';
-    document.getElementById('fc-back-sentence').innerText = word.sentence || 'No example sentence.';
+    const backPos = document.getElementById('fc-back-pos');
+    if (backPos) backPos.innerText = word.part_of_speech || 'Word';
+
+    const backMeaning = document.getElementById('fc-back-meaning');
+    if (backMeaning) backMeaning.innerText = word.meaning || '';
+
+    const backSentence = document.getElementById('fc-back-sentence');
+    if (backSentence) backSentence.innerText = word.sentence || 'No example sentence.';
+
+    const backSentenceBn = document.getElementById('fc-back-sentence-bn');
+    if (backSentenceBn) backSentenceBn.innerText = word.sentence_bn || '';
 
     const synonymsBox = document.getElementById('fc-back-synonyms');
     if (synonymsBox) {
@@ -1110,8 +1393,16 @@ function renderCurrentFlashcard() {
             : '';
     }
 
+    const antonymsBox = document.getElementById('fc-back-antonyms');
+    if (antonymsBox) {
+        antonymsBox.innerHTML = (word.antonyms && word.antonyms.length)
+            ? word.antonyms.map(a => `<span class="badge badge-sm badge-outline badge-secondary">${a}</span>`).join(' ')
+            : '';
+    }
+
     const isMastered = state.mastered.includes(word.id);
-    document.getElementById('fc-back-status').innerText = isMastered ? 'Status: Mastered ✅' : 'Status: Learning 📖';
+    const backStatus = document.getElementById('fc-back-status');
+    if (backStatus) backStatus.innerText = isMastered ? 'Status: Mastered ✅' : 'Status: Learning 📖';
 }
 
 function nextFlashcard() {
@@ -1163,8 +1454,23 @@ function markFlashcardMastery(isKnown) {
 // 14. Quiz Arena Implementation
 // ==========================================================================
 
+function changeQuizLesson(val) {
+    state.quiz.lessonMode = val;
+    startQuiz();
+}
+
 async function startQuiz() {
-    const pool = await getActiveWordPool();
+    let pool = [];
+    if (state.quiz.lessonMode === 'all') {
+        pool = state.allWords.length ? state.allWords : await getActiveWordPool();
+    } else if (state.quiz.lessonMode === 'current') {
+        pool = state.currentWords.length >= 4 ? state.currentWords : (state.allWords.length ? state.allWords : await getActiveWordPool());
+    } else {
+        const lvl = Number(state.quiz.lessonMode);
+        pool = state.allWords.filter(w => Number(w.level_no) === lvl);
+        if (pool.length < 4) pool = state.allWords;
+    }
+
     if (pool.length < 4) {
         showToast('Need at least 4 words to start a quiz!', 'warning');
         return;
@@ -1176,7 +1482,8 @@ async function startQuiz() {
 
     state.quiz.questions = selected.map(target => {
         // Pick 3 wrong options
-        const distractors = pool.filter(w => w.id !== target.id)
+        const distractors = (state.allWords.length > 5 ? state.allWords : pool)
+            .filter(w => w.id !== target.id)
             .sort(() => 0.5 - Math.random())
             .slice(0, 3)
             .map(w => w.meaning);
@@ -1186,13 +1493,16 @@ async function startQuiz() {
             word: target.word,
             correct: target.meaning,
             options: options,
-            id: target.id
+            id: target.id,
+            pronunciation: target.pronunciation,
+            sentence: target.sentence
         };
     });
 
     state.quiz.currentIndex = 0;
     state.quiz.score = 0;
     state.quiz.answered = false;
+    state.quiz.missedQuestions = [];
 
     document.getElementById('quiz-question-box')?.classList.remove('hidden');
     document.getElementById('quiz-summary-box')?.classList.add('hidden');
@@ -1204,9 +1514,20 @@ function renderCurrentQuizQuestion() {
     if (!q) return;
 
     state.quiz.answered = false;
-    document.getElementById('quiz-question-badge').innerText = `Question ${state.quiz.currentIndex + 1} of ${state.quiz.questions.length}`;
-    document.getElementById('quiz-score-display').innerText = `${state.quiz.score} / ${state.quiz.currentIndex}`;
-    document.getElementById('quiz-question-word').innerText = q.word;
+    const badge = document.getElementById('quiz-question-badge');
+    if (badge) badge.innerText = `Question ${state.quiz.currentIndex + 1} of ${state.quiz.questions.length}`;
+
+    const scoreDisplay = document.getElementById('quiz-score-display');
+    if (scoreDisplay) scoreDisplay.innerText = `${state.quiz.score} / ${state.quiz.currentIndex}`;
+
+    const qWord = document.getElementById('quiz-question-word');
+    if (qWord) qWord.innerText = q.word;
+
+    const progressBar = document.getElementById('quiz-progress-bar');
+    if (progressBar) {
+        progressBar.max = state.quiz.questions.length;
+        progressBar.value = state.quiz.currentIndex + 1;
+    }
 
     const feedback = document.getElementById('quiz-feedback');
     if (feedback) {
@@ -1218,10 +1539,14 @@ function renderCurrentQuizQuestion() {
     if (!container) return;
     container.innerHTML = '';
 
-    q.options.forEach((optText) => {
+    q.options.forEach((optText, optIdx) => {
         const btn = document.createElement('button');
-        btn.className = 'btn btn-outline btn-lg w-full text-left justify-start font-bangla text-base rounded-2xl h-auto py-3.5 px-5';
-        btn.innerText = optText;
+        btn.className = 'btn btn-outline btn-lg w-full text-left justify-start font-bangla text-base rounded-2xl h-auto py-3.5 px-5 group relative';
+        btn.dataset.optionIndex = (optIdx + 1).toString();
+        btn.innerHTML = `
+            <span class="badge badge-sm badge-neutral mr-3 font-mono font-bold">${optIdx + 1}</span>
+            <span class="flex-1">${optText}</span>
+        `;
         btn.onclick = () => handleQuizAnswer(optText, q.correct, btn);
         container.appendChild(btn);
     });
@@ -1231,18 +1556,21 @@ function handleQuizAnswer(selected, correct, clickedBtn) {
     if (state.quiz.answered) return;
     state.quiz.answered = true;
 
+    const currentQ = state.quiz.questions[state.quiz.currentIndex];
     const feedback = document.getElementById('quiz-feedback');
     const allButtons = document.querySelectorAll('#quiz-options-container button');
 
     allButtons.forEach(btn => {
-        if (btn.innerText === correct) {
+        const textSpan = btn.querySelector('.flex-1');
+        const textVal = textSpan ? textSpan.innerText.trim() : btn.innerText.trim();
+        if (textVal === correct.trim()) {
             btn.className = 'btn btn-success text-white btn-lg w-full text-left justify-start font-bangla text-base rounded-2xl h-auto py-3.5 px-5';
         } else if (btn === clickedBtn) {
             btn.className = 'btn btn-error text-white btn-lg w-full text-left justify-start font-bangla text-base rounded-2xl h-auto py-3.5 px-5';
         }
     });
 
-    if (selected === correct) {
+    if (selected.trim() === correct.trim()) {
         state.quiz.score++;
         playAudioSfx('correct');
         addXP(20);
@@ -1252,6 +1580,13 @@ function handleQuizAnswer(selected, correct, clickedBtn) {
         }
     } else {
         playAudioSfx('wrong');
+        if (currentQ) {
+            state.quiz.missedQuestions.push({
+                word: currentQ.word,
+                correct: currentQ.correct,
+                selected: selected
+            });
+        }
         if (feedback) {
             feedback.innerText = `❌ Incorrect. Correct was: ${correct}`;
             feedback.className = 'min-h-[44px] flex items-center justify-center text-sm font-bold bg-error/15 text-error rounded-xl';
@@ -1278,6 +1613,33 @@ function finishQuiz() {
     document.getElementById('quiz-final-score').innerText = score.toString();
     document.getElementById('quiz-total-questions').innerText = total.toString();
     document.getElementById('quiz-xp-awarded').innerText = `+${score * 20} XP Total Earned`;
+
+    const progressBar = document.getElementById('quiz-progress-bar');
+    if (progressBar) progressBar.value = total;
+
+    // Missed Questions List
+    const missedContainer = document.getElementById('quiz-missed-list');
+    const missedItems = document.getElementById('quiz-missed-items');
+    if (missedContainer && missedItems) {
+        if (state.quiz.missedQuestions.length > 0) {
+            missedContainer.classList.remove('hidden');
+            missedItems.innerHTML = state.quiz.missedQuestions.map(m => `
+                <div class="flex items-center justify-between bg-base-100 p-2.5 rounded-xl border border-base-300">
+                    <div>
+                        <span class="font-bold text-base-content text-sm">${m.word}</span>: 
+                        <span class="text-success font-bangla font-semibold">${m.correct}</span>
+                        <span class="text-error font-bangla ml-2 text-[11px]">(You picked: ${m.selected})</span>
+                    </div>
+                    <button onclick="pronounceWord('${m.word}')" class="btn btn-xs btn-ghost btn-circle" title="Pronounce">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                </div>
+            `).join('');
+        } else {
+            missedContainer.classList.add('hidden');
+            missedItems.innerHTML = '';
+        }
+    }
 
     if (score === total) {
         launchConfetti(3000);
@@ -1449,6 +1811,35 @@ function handleMemoryCardClick(idx, el) {
 // 17. Search, Filtering & Sorting Controls
 // ==========================================================================
 
+let searchDebounceTimer = null;
+
+function liveSearch(term) {
+    const trimmed = (term || '').trim().toLowerCase();
+    const clearBtn = document.getElementById('clear-search-btn');
+    if (clearBtn) clearBtn.classList.toggle('hidden', trimmed.length === 0);
+
+    if (!trimmed) {
+        if (state.activeLessonId) {
+            loadLevelWord(state.activeLessonId);
+        } else {
+            loadAllWords();
+        }
+        return;
+    }
+
+    const pool = state.allWords.length ? state.allWords : state.currentWords;
+    const filtered = pool.filter(w =>
+        (w.word && w.word.toLowerCase().includes(trimmed)) ||
+        (w.meaning && w.meaning.toLowerCase().includes(trimmed)) ||
+        (w.sentence && w.sentence.toLowerCase().includes(trimmed)) ||
+        (w.synonyms && w.synonyms.some(s => s.toLowerCase().includes(trimmed)))
+    );
+
+    removeActiveClass();
+    state.currentWords = filtered;
+    renderWordsList(`Search: "${trimmed}" (${filtered.length} found)`);
+}
+
 function handleSearch() {
     const input = document.getElementById('input-search');
     const term = (input?.value || '').trim().toLowerCase();
@@ -1462,18 +1853,8 @@ function handleSearch() {
         renderRecentSearches();
     }
 
-    manageSpinner(true);
-    removeActiveClass();
-
-    const pool = state.allWords.length ? state.allWords : state.currentWords;
-    const filtered = pool.filter(w =>
-        (w.word && w.word.toLowerCase().includes(term)) ||
-        (w.meaning && w.meaning.toLowerCase().includes(term))
-    );
-
-    state.currentWords = filtered;
-    renderWordsList(`Search: "${term}"`);
-    showToast(`Found ${filtered.length} matching words`, 'info');
+    liveSearch(term);
+    showToast(`Found ${state.currentWords.length} matching words`, 'info');
 }
 
 function quickSearchWord(term) {
@@ -1490,7 +1871,11 @@ function clearSearchInput() {
     const input = document.getElementById('input-search');
     if (input) input.value = '';
     document.getElementById('clear-search-btn')?.classList.add('hidden');
-    loadAllWords();
+    if (state.activeLessonId) {
+        loadLevelWord(state.activeLessonId);
+    } else {
+        loadAllWords();
+    }
 }
 
 function renderRecentSearches() {
@@ -1627,7 +2012,7 @@ window.addEventListener('offline', () => {
 // ==========================================================================
 
 window.addEventListener('keydown', (e) => {
-    // If inside an input or textarea, ignore single-letter navigation
+    // If inside an input or textarea, handle Enter
     if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
         if (e.key === 'Enter' && document.activeElement.id === 'input-search') {
             handleSearch();
@@ -1651,6 +2036,15 @@ window.addEventListener('keydown', (e) => {
     } else if (e.key === 'ArrowLeft' && state.activeMode === 'flashcards') {
         e.preventDefault();
         prevFlashcard();
+    } else if ((e.key === 'p' || e.key === 'P') && state.activeMode === 'flashcards') {
+        e.preventDefault();
+        toggleFlashcardAutoPlay();
+    } else if ((e.key === 'm' || e.key === 'M') && state.activeMode === 'flashcards') {
+        e.preventDefault();
+        markFlashcardMastery(true);
+    } else if (['1', '2', '3', '4'].includes(e.key) && state.activeMode === 'quiz') {
+        const btn = document.querySelector(`#quiz-options-container button[data-option-index="${e.key}"]`);
+        if (btn) btn.click();
     } else if (e.key === 't' || e.key === 'T') {
         toggleAppTheme();
     } else if (e.key === '?') {
@@ -1658,10 +2052,13 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
-// Search input debounce & clear button indicator
+// Search input debounced live search & clear button indicator
 document.getElementById('input-search')?.addEventListener('input', (e) => {
-    const hasVal = e.target.value.trim().length > 0;
-    document.getElementById('clear-search-btn')?.classList.toggle('hidden', !hasVal);
+    const val = e.target.value;
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => {
+        liveSearch(val);
+    }, 150);
 });
 
 document.getElementById('btn-search')?.addEventListener('click', handleSearch);

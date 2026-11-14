@@ -50,16 +50,18 @@ Traditional rote memorization frequently falls short because words lack auditory
 ## ✨ 60+ Interactive Features
 
 ### 🃏 1. Interactive Learning Modes & Games
-1. **3D Interactive Flashcards:** Realistic CSS 3D flip card effect showing English word on the front, Bengali meaning and example on the back.
-2. **Flashcard Keyboard Navigation:** Flip with `Space`, navigate next/prev with `Arrow` keys.
-3. **Flashcard Mastery Toggles:** Mark cards as *Known* (adds to Mastered) or *Review* with a single click.
-4. **Dynamic Card Shuffling:** Randomize flashcard deck order anytime.
-5. **Multiple-Choice Quiz Arena:** 10-question adaptive quiz generated dynamically from lessons.
-6. **Real-time Quiz Feedback:** Instant visual indicators and synthesized audio feedback for correct and wrong answers.
-7. **Comprehensive Quiz Scorecards:** End-of-quiz breakdown with percentage scores, review list, and XP bonus.
-8. **Spelling & Typing Practice Game:** Listen to audio prompts and Bengali meanings, then type the exact spelling.
-9. **Interactive Spelling Hint Revealer:** Reveals first and last letters with placeholders on demand.
-10. **Memory Word-Match Game:** Interactive 12-tile grid to match English vocabulary with corresponding Bengali definitions.
+1. **3D Interactive Flashcards:** Realistic CSS 3D flip card effect showing English word and Part of Speech on the front, Bengali meaning, example sentence with Bengali translation, and antonyms on the back.
+2. **Flashcard Auto-Play Slideshow:** Hands-free study mode automatically advancing through vocabulary cards with animated pulsing indicators (toggle with <kbd>P</kbd>).
+3. **Deck Selector for Flashcards & Quiz:** Practice any specific lesson (Lessons 1–7), the complete vocabulary deck, or only saved words without leaving the practice arena.
+4. **Flashcard Keyboard Navigation:** Flip with <kbd>Space</kbd>, navigate next/prev with <kbd>→</kbd> / <kbd>←</kbd> keys, toggle auto-play with <kbd>P</kbd>, and mark mastered with <kbd>M</kbd>.
+5. **Flashcard Mastery Toggles:** Mark cards as *Known* (adds to Mastered) or *Review* with a single click.
+6. **Dynamic Card Shuffling:** Randomize flashcard deck order anytime.
+7. **Multiple-Choice Quiz Arena:** 10-question adaptive quiz generated dynamically from lessons with numeric keyboard hotkeys (<kbd>1</kbd>–<kbd>4</kbd>).
+8. **Real-time Quiz Feedback & Progress Bar:** Instant visual indicators, percentage progress bar, and synthesized audio feedback for correct and wrong answers.
+9. **Comprehensive Quiz Scorecards & Missed Review:** End-of-quiz breakdown with percentage scores, XP bonus, and a detailed review list of missed words with audio replay.
+10. **Spelling & Typing Practice Game:** Listen to audio prompts and Bengali meanings, then type the exact spelling.
+11. **Interactive Spelling Hint Revealer:** Reveals first and last letters with placeholders on demand.
+12. **Memory Word-Match Game:** Interactive 12-tile grid to match English vocabulary with corresponding Bengali definitions.
 
 ### 🔊 2. Audio, Pronunciation & Web Audio API
 11. **Native Text-to-Speech (TTS):** Crystal-clear speech output powered by the browser Web Speech API.
@@ -88,15 +90,18 @@ Traditional rote memorization frequently falls short because words lack auditory
 30. **Reset Study Progress Safely:** Option to reset learning statistics with confirmation safeguards.
 
 ### 🔍 5. Search, Filter & Sorters
-31. **Bilingual Real-Time Search:** Search seamlessly by English spelling OR Bengali meaning text.
-32. **Search Term Highlighting:** Matched keywords clearly highlighted in search results.
-33. **Recent Search History:** Tag pills showing your last 5 searched words for instant re-queries.
-34. **Alphabetical Sorting (A to Z & Z to A):** Reorder words alphabetically on demand.
-35. **Difficulty / Length Sorting:** Sort by word length from shortest to longest.
-36. **Difficulty Level Badges:** Automatically categorized into **Easy** (≤5 letters), **Medium** (6-8 letters), and **Hard** (9+ letters).
-37. **Grid View vs Compact List View:** Switch between responsive 3-column cards and space-efficient table rows.
-38. **"All Words" Master View:** Access all 170+ words across lessons in a single view.
-39. **Syllable Breakdown Display:** Visual breakdown (e.g., `ea • ger`, `se • ren • dip • i • ty`) aiding Bengali learners.
+33. **Instant Debounced Live Search:** Real-time search as you type across English words, Bengali meanings, sentences, and synonyms.
+34. **Part of Speech (POS) Filter:** Easily filter vocabulary by grammatical categories: **Noun (বিশেষ্য)**, **Verb (ক্রিয়া)**, **Adjective (বিশেষণ)**, or **Adverb (ক্রিয়া বিশেষণ)**.
+35. **Sticky Segmented Mode Navigation Bar:** Clean, professional top-level navigation pill bar that stays accessible as you scroll, allowing instant one-click switching between Browse, Flashcards, Quiz, Spelling, Memory Match, and Saved Words.
+36. **Active Lesson Overview Banner:** Hero card showcasing the active lesson difficulty badge, word count, description, and 1-click practice launch buttons.
+37. **Bilingual Search Highlighting:** Matched keywords clearly highlighted in search results.
+38. **Recent Search History:** Tag pills showing your last 5 searched words for instant re-queries.
+39. **Alphabetical Sorting (A to Z & Z to A):** Reorder words alphabetically on demand.
+40. **Difficulty / Length Sorting:** Sort by word length from shortest to longest.
+41. **Difficulty Level Badges:** Categorized into **Easy** (≤5 letters), **Medium** (6-8 letters), and **Hard** (9+ letters).
+42. **Grid View vs Compact List View:** Switch between responsive 3-column cards and space-efficient table rows.
+43. **"All Words" Master View:** Access all vocabulary words across all 7 lessons in a single view.
+44. **Syllable Breakdown Display:** Visual breakdown (e.g., `ea • ger`, `se • ren • dip • i • ty`) aiding pronunciation.
 
 ### 🎨 6. UI, Themes & Accessibility
 40. **Dark Mode / Light Mode Theme Engine:** Modern palette supporting manual toggle and OS `prefers-color-scheme`.
@@ -140,10 +145,12 @@ Traditional rote memorization frequently falls short because words lack auditory
 | Shortcut | Action |
 | :---: | :--- |
 | <kbd>/</kbd> | Focus Search Bar |
-| <kbd>Space</kbd> | Flip 3D Flashcard / Listen Pronunciation |
-| <kbd>→</kbd> | Next Flashcard |
-| <kbd>←</kbd> | Previous Flashcard |
-| <kbd>t</kbd> | Toggle Dark / Light Mode |
+| <kbd>Space</kbd> | Flip 3D Flashcard |
+| <kbd>→</kbd> / <kbd>←</kbd> | Next / Previous Flashcard |
+| <kbd>P</kbd> | Toggle Flashcard Slideshow Auto-Play |
+| <kbd>M</kbd> | Mark Current Flashcard as Mastered |
+| <kbd>1</kbd>–<kbd>4</kbd> | Select Quiz Option 1, 2, 3, or 4 |
+| <kbd>T</kbd> | Toggle Dark / Light Theme Mode |
 | <kbd>?</kbd> | Open Keyboard Shortcuts Cheatsheet |
 | <kbd>Esc</kbd> | Close Any Open Modal Dialog |
 
@@ -153,7 +160,7 @@ Traditional rote memorization frequently falls short because words lack auditory
 
 ### Prerequisites
 - Any modern web browser (Google Chrome, Microsoft Edge, Mozilla Firefox, Safari)
-- Internet connection (for initial vocabulary API loading)
+- Internet connection (optional; fully offline capable via built-in dataset)
 
 ### Local Setup
 ```bash
@@ -190,8 +197,10 @@ xdg-open index.html
 │   ├── logo.png                    # Brand logo
 │   ├── hero-student.png            # Hero section illustration
 │   └── *.png                       # Thumbnails and icons
+├── data/
+│   └── vocabulary.js               # Enriched offline/fallback 140-word dataset with POS & translations
 ├── script/
-│   └── index.js                    # Application logic engine & audio synthesizer
+│   └── index.js                    # Application logic engine, TTS, quiz & audio synthesizer
 ├── style/
 │   └── style.css                   # Custom styles, 3D cards, themes & animations
 ├── CHANGELOG.md                    # Keep-a-Changelog version history

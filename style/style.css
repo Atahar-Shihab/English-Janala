@@ -425,8 +425,65 @@ kbd.app-kbd {
 }
 
 /* --------------------------------------------------------------------------
-   14. WebKit Scrollbar
+   14. Refined Navigation Tabs & Mode Segmented Controller
    -------------------------------------------------------------------------- */
+.mode-nav-tab {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mode-nav-tab.active {
+    background-color: #4f46e5 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+}
+
+[data-theme="dark"] .mode-nav-tab.active {
+    background-color: #6366f1 !important;
+    color: #ffffff !important;
+}
+
+/* Audio Speaking Animation */
+@keyframes speakingWave {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.6);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(79, 70, 229, 0);
+        transform: scale(1.08);
+    }
+}
+
+.speaking-pulse {
+    animation: speakingWave 1.2s infinite ease-in-out !important;
+    background-color: #4f46e5 !important;
+    color: #ffffff !important;
+}
+
+/* Slideshow Auto-play pulse badge */
+@keyframes autoPlayPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.95); }
+}
+
+.autoplay-pulsing {
+    animation: autoPlayPulse 1.5s infinite ease-in-out;
+}
+
+/* --------------------------------------------------------------------------
+   15. WebKit Scrollbar & Utilities
+   -------------------------------------------------------------------------- */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
